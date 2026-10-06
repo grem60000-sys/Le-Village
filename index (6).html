@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Village · Économie Première STMG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --night:#17233B; --night2:#22314F; --paper:#F5F1E6; --card:#FFFDF7; --ink:#1E2433; --muted:#667085; --rule:#DDD5C3;
+  --gold:#E2A93B; --gold-d:#B9841E; --green:#3E8E5E; --red:#C24A3A; --blue:#3C6FB6;
+  --ferme:#D9A830; --scierie:#8A5A32; --forge:#5C6670; --boulangerie:#D9763A; --batisseur:#B8463F; --ecole:#3C6FB6;
+  --display:"Fredoka","Trebuchet MS",sans-serif; --body:"Nunito Sans","Segoe UI",Arial,sans-serif;
+  box-sizing:border-box; color-scheme:light;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;height:100%}
+body{font-family:var(--body);color:var(--ink);background:var(--paper);font-size:15px;line-height:1.45}
+button,input,select{font-family:inherit;font-size:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hidden{display:none!important}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;margin:0}
+.btn{border:0;border-radius:10px;padding:.6rem 1rem;font-weight:800;cursor:pointer;background:var(--night);color:#fff;box-shadow:0 3px 0 #0B1222}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0B1222}
+.btn.gold{background:var(--gold);color:var(--night);box-shadow:0 3px 0 var(--gold-d)}
+.btn.green{background:var(--green);box-shadow:0 3px 0 #2A6542}
+.btn.red{background:var(--red);box-shadow:0 3px 0 #8E3328}
+.btn.ghost{background:#fff;color:var(--night);box-shadow:inset 0 0 0 2px var(--rule)}
+.btn.sm{padding:.35rem .65rem;font-size:.85rem;border-radius:8px}
+.btn:disabled{opacity:.45;cursor:default}
+input[type=number],input[type=text],select{border:2px solid var(--rule);border-radius:8px;padding:.4rem .5rem;background:#fff;color:var(--ink);width:100%;min-width:0}
+input:focus,select:focus{border-color:var(--gold);outline:none}
+label.f{display:flex;flex-direction:column;gap:.2rem;font-weight:800;font-size:.82rem;color:var(--muted)}
+.card{background:var(--card);border:2px solid var(--rule);border-radius:14px;padding:1rem}
+.pill{display:inline-flex;align-items:center;gap:.3rem;border-radius:999px;padding:.15rem .6rem;font-weight:800;font-size:.78rem;background:#EFE8D6}
+.tag-ok{background:#DCEFE2;color:#2A6542}.tag-wait{background:#F6E7C8;color:#8A5D0B}.tag-ko{background:#F6DCD7;color:#8E3328}
+table.t{border-collapse:collapse;width:100%;font-size:.88rem}
+table.t th{text-align:left;font-weight:800;color:var(--muted);font-size:.75rem;padding:.35rem .4rem;border-bottom:2px solid var(--rule)}
+table.t td{padding:.35rem .4rem;border-bottom:1px solid #ECE5D3}
+table.t td.n,table.t th.n{text-align:right;font-variant-numeric:tabular-nums}
+table.t tr.tot td{font-weight:800;border-top:2px solid var(--ink)}
+.banner{background:#FFF3CF;border-bottom:2px solid var(--gold);padding:.45rem 1rem;font-size:.85rem;text-align:center}
+
+/* Accueil */
+#home{min-height:100%;display:grid;place-items:center;background:radial-gradient(circle at 50% 120%,#3C5A3A 0,#22314F 55%,#17233B 100%);color:#fff;padding:2rem 1rem}
+.home-in{max-width:880px;width:100%}
+.home-in h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1;letter-spacing:-.01em}
+.home-in h1 span{color:var(--gold)}
+.home-in .lead{font-size:1.15rem;color:#D5DCEA;max-width:46ch;margin:.8rem 0 2rem}
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+.home-card{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.15);border-radius:16px;padding:1.2rem;display:flex;flex-direction:column;gap:.7rem}
+.home-card h2{font-size:1.35rem}
+.home-card p{margin:0;color:#C9D1E1;font-size:.92rem}
+.home-card input{background:#fff}
+.teams-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}
+.teams-pick button{border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:.6rem;text-align:left;cursor:pointer;font-weight:800;display:flex;gap:.5rem;align-items:center}
+.teams-pick button:hover:not(:disabled){border-color:var(--gold)}
+.teams-pick button:disabled{opacity:.35;cursor:default}
+.teams-pick .em{font-size:1.4rem}
+.botpick{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem}
+.botpick label{display:flex;gap:.35rem;align-items:center;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);border-radius:10px;padding:.35rem .5rem;font-weight:800;font-size:.82rem;cursor:pointer}
+.botpick input{accent-color:var(--gold)}
+.botbadge{display:inline-block;background:#E7E9F3;color:#3A4166;border-radius:6px;padding:0 .35rem;font-size:.75rem;font-weight:800;margin-left:.3rem}
+
+/* Barre haute commune */
+.top{display:flex;align-items:center;gap:.8rem;padding:.55rem 1rem;background:var(--night);color:#fff;flex-wrap:wrap}
+.top .brand{font-family:var(--display);font-weight:700;font-size:1.15rem}
+.top .brand span{color:var(--gold)}
+.top .sp{flex:1}
+.top .chip{background:rgba(255,255,255,.1);border-radius:999px;padding:.2rem .7rem;font-weight:800;font-size:.85rem}
+.top .chip b{color:var(--gold)}
+.timer{font-family:var(--display);font-size:1.1rem;min-width:4.5ch;text-align:center}
+
+/* Vue équipe */
+#team .wrap{max-width:1250px;margin:0 auto;padding:1rem;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:1rem}
+.team-head{display:flex;align-items:center;gap:.8rem;padding:1rem;border-radius:14px;color:#fff}
+.team-head .em{font-size:2.6rem;line-height:1}
+.team-head h2{font-size:1.6rem}
+.team-head p{margin:0;opacity:.9;font-size:.9rem}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.8rem}
+.stat{background:#fff;border:2px solid var(--rule);border-radius:10px;padding:.45rem .6rem}
+.stat small{display:block;color:var(--muted);font-weight:800;font-size:.7rem}
+.stat b{font-family:var(--display);font-size:1.2rem}
+.tabs{display:flex;gap:.3rem;margin-bottom:.7rem;flex-wrap:wrap}
+.tabs button{border:0;background:#EFE8D6;border-radius:999px;padding:.4rem .85rem;font-weight:800;cursor:pointer;color:var(--ink)}
+.tabs button[aria-selected=true]{background:var(--night);color:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.help{font-size:.8rem;color:var(--muted);margin:.15rem 0 0}
+.offer{border:2px solid var(--rule);border-radius:12px;padding:.6rem .7rem;margin-bottom:.5rem;background:#fff;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.offer .em{font-size:1.5rem}
+.offer .txt{flex:1;min-width:180px;font-size:.9rem}
+.offer .txt b{font-family:var(--display)}
+.offer.in{border-color:var(--gold);background:#FFF8E6}
+.offer.acc{border-color:#A9D3B6;background:#F1FAF3}
+.preview{background:var(--night);color:#fff;border-radius:14px;padding:1rem}
+.preview h3{font-size:1.1rem;margin-bottom:.5rem}
+.preview table.t th{color:#AFC0DA;border-color:rgba(255,255,255,.2)}
+.preview table.t td{border-color:rgba(255,255,255,.1)}
+.preview table.t tr.tot td{border-color:#fff}
+.bott{display:flex;align-items:center;gap:.4rem;font-size:.86rem;margin:.25rem 0}
+.bott i{flex:none;width:.7rem;height:.7rem;border-radius:50%}
+.minimap{position:relative;border-radius:14px;overflow:hidden;background:#7FB069;height:300px}
+.minimap canvas{width:100%;height:100%;display:block}
+.alert{background:#FDECE8;border:2px solid #F0B9AE;color:#8E3328;border-radius:10px;padding:.5rem .7rem;font-size:.86rem;font-weight:600;margin:.4rem 0}
+.okbox{background:#E7F5EB;border:2px solid #A9D3B6;color:#2A6542;border-radius:10px;padding:.5rem .7rem;font-size:.86rem;font-weight:600;margin:.4rem 0}
+
+/* Console prof */
+#prof .wrap{max-width:1400px;margin:0 auto;padding:1rem;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1rem}
+.tcards{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.tcard{border-radius:12px;padding:.6rem .7rem;background:#fff;border:2px solid var(--rule);border-left-width:8px}
+.tcard h4{font-size:1rem;display:flex;justify-content:space-between;gap:.4rem}
+.tcard p{margin:.2rem 0 0;font-size:.82rem;color:var(--muted)}
+.seg{display:flex;gap:.3rem;flex-wrap:wrap}
+.seg button{border:2px solid var(--rule);background:#fff;border-radius:8px;padding:.35rem .6rem;font-weight:800;cursor:pointer;font-size:.85rem}
+.seg button[aria-pressed=true]{background:var(--night);color:#fff;border-color:var(--night)}
+.loglist{max-height:280px;overflow:auto;font-size:.85rem}
+.loglist div{padding:.3rem 0;border-bottom:1px solid #ECE5D3}
+
+/* Projection */
+#proj{position:fixed;inset:0;background:#0E1626;color:#fff;overflow:hidden}
+#proj canvas{position:absolute;inset:0;width:100%;height:100%}
+.hud{position:absolute;left:0;right:0;top:0;display:flex;gap:.7rem;align-items:center;padding:.8rem 1rem;background:linear-gradient(#0E1626EE,#0E162600);pointer-events:none;flex-wrap:wrap}
+.hud .brand{font-family:var(--display);font-size:1.6rem;font-weight:700}
+.hud .brand span{color:var(--gold)}
+.hud .k{background:rgba(14,22,38,.72);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:.35rem .75rem;backdrop-filter:blur(4px)}
+.hud .k small{display:block;font-size:.7rem;color:#AFC0DA;font-weight:800}
+.hud .k b{font-family:var(--display);font-size:1.35rem}
+.hud .k.dc{border-color:rgba(226,169,59,.6)}
+.hud .k.dc b{color:#F2C46A}
+.gauge{width:120px;height:9px;border-radius:5px;background:rgba(255,255,255,.15);overflow:hidden;margin-top:.2rem}
+.gauge i{display:block;height:100%;background:linear-gradient(90deg,#E2A93B,#7CD38F);transition:width 1s}
+.dock{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(6,1fr);gap:.5rem;padding:.8rem;background:linear-gradient(#0E162600,#0E1626F2 40%)}
+.dcard{background:rgba(255,253,247,.96);color:var(--ink);border-radius:12px;padding:.5rem .6rem;border-top:6px solid}
+.dcard h4{font-size:.95rem;display:flex;gap:.3rem;align-items:center}
+.dcard .r{display:flex;justify-content:space-between;font-size:.8rem;margin-top:.15rem}
+.dcard .r b{font-variant-numeric:tabular-nums}
+.blur .sens{filter:blur(6px)}
+.ticker{position:absolute;left:50%;top:84px;transform:translateX(-50%);background:var(--gold);color:var(--night);font-weight:800;border-radius:999px;padding:.4rem 1rem;font-size:1rem;box-shadow:0 6px 20px rgba(0,0,0,.35);transition:opacity .4s}
+.side{position:absolute;right:1rem;top:90px;bottom:190px;width:min(430px,38vw);background:rgba(255,253,247,.97);color:var(--ink);border-radius:16px;padding:1rem;overflow:auto}
+.side h3{font-size:1.4rem;margin-bottom:.4rem}
+.compare{position:absolute;inset:84px 1rem 1rem;background:rgba(255,253,247,.98);color:var(--ink);border-radius:16px;padding:1.2rem;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.compare h3{font-size:1.2rem;margin-bottom:.5rem}
+.hbar{display:flex;height:46px;border-radius:10px;overflow:hidden;margin:.6rem 0 .3rem}
+.hbar div{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.9rem;white-space:nowrap;overflow:hidden}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;font-weight:700}
+.endscreen{position:absolute;inset:84px 1rem 1rem;background:rgba(255,253,247,.98);color:var(--ink);border-radius:16px;padding:1.5rem;overflow:auto}
+.season{position:absolute;right:1rem;top:84px;font-family:var(--display);font-size:1.3rem;background:rgba(14,22,38,.72);padding:.3rem .8rem;border-radius:10px}
+@media (max-width:980px){
+  #team .wrap,#prof .wrap{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .tcards{grid-template-columns:repeat(2,1fr)}
+  .dock{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div id="modeBanner" class="banner hidden"></div>
+
+<!-- ======================= ACCUEIL ======================= -->
+<section id="home" class="hidden">
+  <div class="home-in">
+    <h1>Le <span>Village</span></h1>
+    <p class="lead">Six activités, un seul village. Produisez, échangez, investissez, et faites prospérer la communauté.</p>
+    <div class="home-grid">
+      <div class="home-card">
+        <h2>Rejoindre mon équipe</h2>
+        <p>Entrez le code affiché au tableau, puis choisissez l'activité qui vous a été attribuée.</p>
+        <input type="text" id="joinCode" placeholder="Code de la partie" maxlength="6" style="text-transform:uppercase;font-weight:800;letter-spacing:.15em">
+        <button class="btn gold" id="joinBtn">Continuer</button>
+        <div id="joinTeams" class="teams-pick hidden"></div>
+        <p id="joinMsg"></p>
+      </div>
+      <div class="home-card">
+        <h2>Espace enseignant</h2>
+        <p>Créez une partie, ou reprenez une partie existante avec son code et votre code secret.</p>
+        <div class="grid2">
+          <label class="f" style="color:#C9D1E1">Nombre d'années<input type="number" id="cfgYears" value="5" min="2" max="10"></label>
+          <label class="f" style="color:#C9D1E1">Code secret<input type="text" id="cfgPin" placeholder="4 chiffres" maxlength="8"></label>
+        </div>
+        <div>
+          <p style="margin:0 0 .4rem;font-weight:800;font-size:.85rem;color:#C9D1E1">Activités jouées par des élèves (les autres seront des robots 🤖)</p>
+          <div class="botpick" id="cfgHumans"></div>
+          <label class="f" style="color:#C9D1E1;margin-top:.5rem">Tempérament des robots<select id="cfgBotMood"><option value="coop">Coopératif : accepte facilement, idéal pour découvrir</option><option value="dur">Dur en affaires : négocie serré</option></select></label>
+        </div>
+        <button class="btn gold" id="createBtn">Créer une partie</button>
+        <div class="grid2"><input type="text" id="resumeCode" placeholder="Code existant" maxlength="6" style="text-transform:uppercase"><button class="btn ghost" id="resumeBtn">Reprendre</button></div>
+        <p id="profMsg"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= VUE ÉQUIPE ======================= -->
+<section id="team" class="hidden">
+  <div class="top">
+    <span class="brand">Le <span>Village</span></span>
+    <span class="chip" id="tYear"></span><span class="chip" id="tPhase"></span>
+    <span class="sp"></span><span class="timer" id="tTimer"></span>
+    <button class="btn sm ghost" id="tRulesBtn">Règles</button>
+  </div>
+  <div class="wrap">
+    <div>
+      <div class="team-head" id="tHead"></div>
+      <div class="stats" id="tStats"></div>
+      <div class="card" style="margin-top:1rem">
+        <div class="tabs" role="tablist" id="tTabs">
+          <button data-t="nego" aria-selected="true">Négocier</button>
+          <button data-t="dec" aria-selected="false">Mes décisions</button>
+          <button data-t="res" aria-selected="false">Mes comptes</button>
+        </div>
+        <div id="tPane"></div>
+      </div>
+    </div>
+    <div>
+      <div class="preview" id="tPreview"></div>
+      <div class="minimap" style="margin-top:1rem"><canvas id="miniCanvas"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= CONSOLE PROF ======================= -->
+<section id="prof" class="hidden">
+  <div class="top">
+    <span class="brand">Le <span>Village</span> · console</span>
+    <span class="chip">Code : <b id="pCode"></b></span>
+    <span class="chip" id="pYear"></span><span class="chip" id="pPhase"></span>
+    <span class="sp"></span><span class="timer" id="pTimer"></span>
+    <button class="btn sm gold" id="openProj">Ouvrir la projection</button>
+  </div>
+  <div class="wrap">
+    <div style="display:grid;gap:1rem;align-content:start">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem">
+          <h3>Déroulé de la partie</h3>
+          <div style="display:flex;gap:.4rem;flex-wrap:wrap" id="pFlow"></div>
+        </div>
+        <div class="tcards" id="pTeams"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:.5rem">Contrats et offres de l'année</h3>
+        <div class="loglist" id="pOffers"></div>
+      </div>
+    </div>
+    <div style="display:grid;gap:1rem;align-content:start">
+      <div class="card">
+        <h3 style="margin-bottom:.6rem">Projection</h3>
+        <div class="seg" id="pView">
+          <button data-v="village" aria-pressed="true">Village</button>
+          <button data-v="equipe" aria-pressed="false">Zoom équipe</button>
+          <button data-v="tour" aria-pressed="false">À tour de rôle</button>
+          <button data-v="compare" aria-pressed="false">Comparer</button>
+          <button data-v="villageois" aria-pressed="false">Les villageois</button>
+        </div>
+        <div class="seg" id="pViewTeam" style="margin-top:.5rem"></div>
+        <label style="display:flex;gap:.5rem;align-items:center;margin-top:.6rem;font-weight:700"><input type="checkbox" id="pBlur" checked> Flouter les informations sensibles (trésorerie, prix)</label>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:.6rem">Réglages de l'année</h3>
+        <div class="grid3">
+          <label class="f">Impôt sur le revenu (%)<input type="number" id="pTaxInc" min="0" max="40"></label>
+          <label class="f">Impôts sur la production (% du CA)<input type="number" id="pTaxProd" min="0" max="20"></label>
+          <label class="f">Durée négociation (min)<input type="number" id="pDur" min="0" max="60"></label>
+        </div>
+        <p class="help">Les impôts financent l'École l'année suivante (production non marchande).</p>
+        <h4 style="margin:.8rem 0 .4rem">Événement pour la fin de l'année</h4>
+        <div class="seg" id="pEvents"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:.5rem">Village</h3>
+        <div id="pVillage"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= PROJECTION ======================= -->
+<section id="proj" class="hidden">
+  <canvas id="bigCanvas"></canvas>
+  <div class="hud" id="hud"></div>
+  <div class="season hidden" id="season"></div>
+  <div class="ticker hidden" id="ticker"></div>
+  <div class="dock" id="dock"></div>
+  <div class="side hidden" id="side"></div>
+  <div class="compare hidden" id="compare"></div>
+  <div class="compare hidden" id="villageois"></div>
+  <div class="endscreen hidden" id="endscreen"></div>
+</section>
+
+<!-- Règles (modale simple) -->
+<div id="rules" class="hidden" style="position:fixed;inset:0;background:rgba(14,22,38,.6);display:grid;place-items:center;z-index:50;padding:1rem">
+  <div class="card" style="max-width:760px;max-height:85vh;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3>Comment fonctionne le village ?</h3><button class="btn sm ghost" id="rulesClose">Fermer</button></div>
+    <div id="rulesBody" style="font-size:.93rem"></div>
+  </div>
+</div>
+<script>
+/* =====================================================================
+   CONFIGURATION — collez ici l'URL et la clé "anon public" de votre
+   projet Supabase (Paramètres > API). Laissées vides, le jeu fonctionne
+   en MODE DÉMO LOCAL : tous les onglets doivent être dans le même navigateur.
+   ===================================================================== */
+const SUPABASE_URL = 'https://ugrzvirjnsvtlgdmfjhg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_RUBurEHjYaPj6iXrx-M4FQ_QIEV7xWS';
+
+/* ============================ DONNÉES ============================ */
+const TEAMS = ['ferme', 'scierie', 'forge', 'boulangerie', 'batisseur', 'ecole'];
+const ORDER = ['scierie', 'ferme', 'forge', 'boulangerie', 'batisseur', 'ecole']; // ordre de la chaîne de production
+const ACT = {
+  ferme:       { name: 'La Ferme', em: '🌾', color: '#D9A830', b: 10, m: 6, cap: 160, recipe: { bois: 0.05 }, conso: 1, unit: 'récoltes',
+                 sells: ['ble'], pub: 'legumes', w0: 10, t0: 4, vaRef: 250, ei: true,
+                 role: "Exploitation individuelle : vous cultivez du blé pour la Boulangerie et des légumes pour les villageois. Votre EBE est le revenu mixte de l'exploitant : il rémunère à la fois son travail et son capital." },
+  scierie:     { name: 'La Scierie', em: '🪵', color: '#8A5A32', b: 8, m: 6, cap: 120, recipe: {}, conso: 1, unit: 'stères',
+                 sells: ['bois'], pub: null, w0: 8, t0: 4, vaRef: 260,
+                 role: "Vous exploitez la forêt. Presque tout le village a besoin de votre bois : c'est vous qui alimentez la chaîne." },
+  forge:       { name: 'La Forge', em: '🔨', color: '#5C6670', b: 1.5, m: 1, cap: 20, recipe: { bois: 2 }, conso: 4, unit: 'outils',
+                 sells: ['outils'], pub: null, w0: 6, t0: 3, vaRef: 160,
+                 role: "Vous fabriquez les outils : le capital de tout le village. Sans vous, personne ne peut investir." },
+  boulangerie: { name: 'La Boulangerie', em: '🍞', color: '#D9763A', b: 12, m: 8, cap: 120, recipe: { ble: 1, bois: 0.1 }, conso: 0.5, unit: 'pains',
+                 sells: ['pain'], pub: 'pain', w0: 6, t0: 3, vaRef: 200,
+                 role: "Vous nourrissez le village. Sans pain, les villageois partent… et les autres équipes perdent leurs travailleurs." },
+  batisseur:   { name: 'Le Bâtisseur', em: '🧱', color: '#B8463F', b: 0.45, m: 0.3, cap: 6, recipe: { bois: 12, outils: 1 }, conso: 3, unit: 'modules',
+                 sells: ['module'], pub: 'module', w0: 8, t0: 2, vaRef: 170,
+                 role: "Vous construisez : des maisons pour accueillir de nouveaux habitants, et des agrandissements d'ateliers pour les autres équipes." },
+  ecole:       { name: "L'École", em: '📚', color: '#3C6FB6', b: 4, m: 2, cap: 40, recipe: { bois: 0.5, pain: 0.5 }, conso: 1, unit: 'places',
+                 sells: [], pub: null, w0: 6, t0: 0, vaRef: 90, nonMarchand: true,
+                 role: "Vous formez les travailleurs des autres équipes : leur capital humain augmente. Votre budget vient des impôts : votre production est non marchande." },
+};
+const GOODS = {
+  ble:     { n: 'Blé', u: 'sacs', ref: 3, em: '🌾', perish: false },
+  legumes: { n: 'Légumes', u: 'paniers', ref: 4, em: '🥕', perish: true },
+  bois:    { n: 'Bois', u: 'stères', ref: 4, em: '🪵', perish: false },
+  outils:  { n: 'Outils', u: 'outils', ref: 25, em: '🔨', perish: false },
+  pain:    { n: 'Pain', u: 'pains', ref: 6, em: '🍞', perish: true },
+  module:  { n: 'Modules', u: 'modules', ref: 120, em: '🧱', perish: false },
+};
+const IMPORT = 1.8, EXPORT = 0.5, WAGE_MIN = 12, TOOLS_PER_WORKER = 2, DEPREC = 0.15, MODULES_PER_LEVEL = 2, HOUSE_CAP = 4;
+const EVENTS = {
+  secheresse: { n: 'Sécheresse', em: '☀️', d: 'La production de la Ferme baisse de 40 %.' },
+  incendie:   { n: 'Incendie de forêt', em: '🔥', d: 'La production de la Scierie baisse de 40 %.' },
+  innovation: { n: 'Innovation', em: '💡', d: 'Progrès technique : chaque outil produit 25 % de plus cette année.' },
+  epidemie:   { n: 'Épidémie', em: '🤒', d: "Le village perd 10 % de ses habitants en fin d'année." },
+  commande:   { n: 'Commande du royaume voisin', em: '📜', d: "Les prix à l'export sont doublés cette année." },
+};
+const buysOf = t => {
+  const s = new Set([...Object.keys(ACT[t].recipe), 'outils', 'module']);
+  ACT[t].sells.forEach(g => s.delete(g));
+  return [...s];
+};
+const sellerOf = g => TEAMS.find(t => ACT[t].sells.includes(g));
+const fmt = (n, d = 0) => (n == null || isNaN(n)) ? '—' : Number(n).toLocaleString('fr-FR', { maximumFractionDigits: d, minimumFractionDigits: d });
+const pct = (n, d = 0) => (n == null || isNaN(n) || !isFinite(n)) ? '—' : fmt(n * 100, d) + ' %';
+const r1 = n => Math.round(n * 10) / 10;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+function newState(years, pin, bots = {}) {
+  const teams = {};
+  TEAMS.forEach(t => {
+    const a = ACT[t];
+    teams[t] = { cash: t === 'ecole' ? 220 : 400, workers: a.w0, wage: 15, skill: 1, tools: a.t0, level: 1, modules: 0,
+                 inv: {}, out: {}, lastProd: null, score: 0 };
+  });
+  return { v: 1, phase: 'lobby', year: 0, years, pin, P: 60, H: 16, savings: 400, incomePrev: 760,
+           taxInc: 15, taxProd: 5, schoolBudget: 220, dur: 12, deadline: null, events: [],
+           view: { mode: 'village', team: 'ferme', blur: true }, teams, history: [], animStamp: 0, bots };
+}
+function defaultDecision(state, t) {
+  const tm = state.teams[t], a = ACT[t], last = state.lastDecisions && state.lastDecisions[t];
+  const d = { workers: tm.workers, wage: tm.wage, target: 0, div: 40, train: 0, pubPrice: a.pub ? GOODS[a.pub].ref : 0,
+              blePct: 80, autoImport: true, autoExport: true, submitted: false };
+  if (last) Object.assign(d, last, { submitted: false });
+  return d;
+}
+
+/* ============================ STOCKAGE ============================ */
+function makeStore() {
+  if (SUPABASE_URL && SUPABASE_KEY && window.supabase) return supaStore();
+  return localStore();
+}
+function localStore() {
+  const K = (c, ...p) => ['vil', c, ...p].join(':');
+  const get = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+  const chans = {};
+  const ping = (code, kind) => { (chans[code] ||= new BroadcastChannel('vil-' + code)).postMessage(kind); };
+  const set = (code, k, v, kind) => { localStorage.setItem(k, JSON.stringify(v)); ping(code, kind); };
+  return {
+    mode: 'local',
+    async getSession(c) { return get(K(c, 'session')); },
+    async saveSession(c, s) { set(c, K(c, 'session'), s, 'session'); },
+    async listMembers(c) { return get(K(c, 'members')) || {}; },
+    async joinTeam(c, team) { const m = get(K(c, 'members')) || {}; m[team] = Date.now(); set(c, K(c, 'members'), m, 'members'); },
+    async getDecision(c, t, y) { return get(K(c, 'dec', y, t)); },
+    async saveDecision(c, t, y, d) { set(c, K(c, 'dec', y, t), d, 'decisions'); },
+    async listDecisions(c, y) { const o = {}; TEAMS.forEach(t => { const d = get(K(c, 'dec', y, t)); if (d) o[t] = d; }); return o; },
+    async listOffers(c, y) { return (get(K(c, 'offers')) || []).filter(o => o.year === y); },
+    async createOffer(c, o) { const L = get(K(c, 'offers')) || []; o.id = 'o' + Date.now() + Math.random().toString(36).slice(2, 6); o.created = Date.now(); L.push(o); set(c, K(c, 'offers'), L, 'offers'); return o; },
+    async updateOffer(c, id, patch, onlyIfPending) {
+      const L = get(K(c, 'offers')) || []; const o = L.find(x => x.id === id); if (!o) return false;
+      if (onlyIfPending && o.status !== 'pending') return false;
+      Object.assign(o, patch); set(c, K(c, 'offers'), L, 'offers'); return true;
+    },
+    subscribe(c, cb) {
+      const ch = chans[c] ||= new BroadcastChannel('vil-' + c);
+      ch.onmessage = e => cb(e.data);
+      window.addEventListener('storage', e => { if (e.key && e.key.startsWith('vil:' + c)) cb('any'); });
+    },
+  };
+}
+function supaStore() {
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const must = r => { if (r.error) { console.error(r.error); throw r.error; } return r.data; };
+  return {
+    mode: 'supabase',
+    async getSession(c) { const r = must(await sb.from('vil_sessions').select('state').eq('code', c).maybeSingle()); return r ? r.state : null; },
+    async saveSession(c, s) { must(await sb.from('vil_sessions').upsert({ code: c, state: s, updated_at: new Date().toISOString() })); },
+    async listMembers(c) { const r = must(await sb.from('vil_members').select('team,joined_at').eq('code', c)); const o = {}; r.forEach(x => o[x.team] = x.joined_at); return o; },
+    async joinTeam(c, team) { must(await sb.from('vil_members').upsert({ code: c, team, joined_at: new Date().toISOString() })); },
+    async getDecision(c, t, y) { const r = must(await sb.from('vil_decisions').select('data').eq('code', c).eq('team', t).eq('year', y).maybeSingle()); return r ? r.data : null; },
+    async saveDecision(c, t, y, d) { must(await sb.from('vil_decisions').upsert({ code: c, team: t, year: y, data: d, updated_at: new Date().toISOString() })); },
+    async listDecisions(c, y) { const r = must(await sb.from('vil_decisions').select('team,data').eq('code', c).eq('year', y)); const o = {}; r.forEach(x => o[x.team] = x.data); return o; },
+    async listOffers(c, y) { const r = must(await sb.from('vil_offers').select('*').eq('code', c).eq('year', y).order('created', { ascending: true })); return r; },
+    async createOffer(c, o) { const row = { ...o, code: c, created: Date.now() }; delete row.id; const r = must(await sb.from('vil_offers').insert(row).select().single()); return r; },
+    async updateOffer(c, id, patch, onlyIfPending) {
+      let q = sb.from('vil_offers').update(patch).eq('id', id); if (onlyIfPending) q = q.eq('status', 'pending');
+      const r = must(await q.select()); return r.length > 0;
+    },
+    subscribe(c, cb) {
+      const ch = sb.channel('vil-' + c);
+      [['vil_sessions', 'session'], ['vil_offers', 'offers'], ['vil_decisions', 'decisions'], ['vil_members', 'members']].forEach(([tb, kind]) =>
+        ch.on('postgres_changes', { event: '*', schema: 'public', table: tb, filter: 'code=eq.' + c }, () => cb(kind)));
+      ch.subscribe();
+    },
+  };
+}
+
+/* ============================ MOTEUR ============================ */
+function potentialOf(t, tm, workers, trainees, events) {
+  const a = ACT[t];
+  const effW = Math.max(0, workers - 0.5 * trainees);
+  const effT = Math.min(tm.tools, TOOLS_PER_WORKER * workers);
+  let m = a.m; if (events.includes('innovation')) m *= 1.25;
+  let p = (effW * a.b + effT * m) * tm.skill;
+  if (t === 'ferme' && events.includes('secheresse')) p *= 0.6;
+  if (t === 'scierie' && events.includes('incendie')) p *= 0.6;
+  const cap = a.cap * (1 + 0.5 * (tm.level - 1));
+  return { potential: r1(p), cap, effT };
+}
+
+function computeYear(S, decisions, offers) {
+  const st = JSON.parse(JSON.stringify(S));
+  const ev = st.events || [];
+  const Y = st.year;
+  const D = {}; TEAMS.forEach(t => D[t] = Object.assign(defaultDecision(S, t), decisions[t] || {}));
+  const rec = { year: Y, events: ev.slice(), teams: {}, flows: [], village: {} };
+  const acc = {}; TEAMS.forEach(t => acc[t] = { ca: 0, caContracts: 0, caPublic: 0, caExport: 0, ci: 0, imports: 0, purchases: 0, invest: 0, conso: 0, output: 0, outputs: {}, deliveredIn: {}, sold: {} });
+
+  // 1. Marché du travail
+  const active = Math.floor(0.75 * st.P);
+  let want = 0; TEAMS.forEach(t => { D[t].workers = Math.max(1, Math.round(+D[t].workers || 1)); D[t].wage = Math.max(WAGE_MIN, +D[t].wage || WAGE_MIN); want += D[t].workers; });
+  const ratio = want > active ? active / want : 1;
+  const alloc = {}; TEAMS.forEach(t => alloc[t] = Math.max(1, Math.floor(D[t].workers * ratio)));
+  rec.village.laborShort = ratio < 1;
+  const trainees = {}; TEAMS.forEach(t => trainees[t] = t === 'ecole' ? 0 : clamp(Math.round(+D[t].train || 0), 0, alloc[t]));
+
+  // Budget de l'École (subvention issue des impôts de l'an dernier)
+  st.teams.ecole.cash += st.schoolBudget; acc.ecole.subvention = st.schoolBudget;
+
+  // 2. Contrats acceptés, rangés par ordre de création
+  const contracts = offers.filter(o => o.status === 'accepted').sort((a, b) => a.created - b.created);
+  const exportMult = ev.includes('commande') ? 2 : 1;
+
+  const addInv = (tm, g, q, v) => { const s = tm.inv[g] ||= { q: 0, v: 0 }; s.q = r1(s.q + q); s.v += v; };
+  const useInv = (tm, g, q) => { const s = tm.inv[g]; if (!s || s.q <= 0) return 0; const cost = s.v / s.q * q; s.q = r1(s.q - q); s.v = Math.max(0, s.v - cost); if (s.q <= 0.001) { s.q = 0; s.v = 0; } return cost; };
+
+  // 3. Production dans l'ordre de la chaîne
+  ORDER.forEach(t => {
+    const a = ACT[t], tm = st.teams[t], d = D[t], A = acc[t];
+    const P = potentialOf(t, tm, alloc[t], trainees[t], ev);
+    let target = Math.min(P.potential, P.cap); if (+d.target > 0) target = Math.min(target, +d.target);
+    // intrants : stock + livraisons déjà reçues ; importations si nécessaire
+    let out = target;
+    Object.entries(a.recipe).forEach(([g, q]) => {
+      const need = target * q, have = (tm.inv[g] && tm.inv[g].q) || 0;
+      if (have < need && d.autoImport) { const miss = r1(need - have); const cost = miss * GOODS[g].ref * IMPORT; addInv(tm, g, miss, cost); A.imports += cost; rec.flows.push({ from: 'monde', to: t, g, q: miss }); }
+      const avail = (tm.inv[g] && tm.inv[g].q) || 0;
+      out = Math.min(out, q > 0 ? avail / q : Infinity);
+    });
+    out = Math.max(0, Math.floor(out * 10) / 10);
+    if (a.unit === 'modules' || a.unit === 'outils') out = Math.floor(out);
+    Object.entries(a.recipe).forEach(([g, q]) => { A.ci += useInv(tm, g, out * q); });
+    A.conso = out * a.conso; A.ci += A.conso;
+    A.output = out; A.potential = P.potential; A.cap = P.cap; A.target = target;
+    // répartition de la production
+    if (t === 'ferme') { const ble = r1(out * clamp(+d.blePct, 0, 100) / 100); A.outputs = { ble, legumes: r1(out - ble) }; }
+    else if (a.sells.length) A.outputs = { [a.sells[0]]: out };
+    else A.outputs = {};
+    // livraisons des contrats où l'équipe est vendeuse
+    Object.keys(A.outputs).forEach(g => {
+      let avail = A.outputs[g] + (GOODS[g].perish ? 0 : (tm.out[g] || 0)); tm.out[g] = 0;
+      contracts.filter(c => c.seller === t && c.good === g).forEach(c => {
+        const q = Math.min(+c.qty, avail); if (q <= 0) { c.delivered = 0; return; }
+        avail = r1(avail - q); c.delivered = q;
+        const val = q * +c.price, B = st.teams[c.buyer], AB = acc[c.buyer];
+        A.caContracts += val; tm.cash += val; B.cash -= val;
+        if (ACT[c.buyer].recipe[g] !== undefined) { addInv(B, g, q, val); AB.purchases += val; }
+        else if (g === 'outils') { B.toolsIn = (B.toolsIn || 0) + q; AB.invest += val; }
+        else if (g === 'module') { B.modulesIn = (B.modulesIn || 0) + q; AB.invest += val; }
+        AB.deliveredIn[g] = (AB.deliveredIn[g] || 0) + q;
+        A.sold[g] = (A.sold[g] || 0) + q;
+        rec.flows.push({ from: t, to: c.buyer, g, q });
+      });
+      A['left_' + g] = avail;
+    });
+  });
+
+  // 4. Ménages (villageois) : budget fondé sur le revenu de l'an dernier
+  const incomeTaxPrev = st.incomePrev * st.taxInc / 100;
+  let budget = 0.9 * (st.incomePrev - incomeTaxPrev) + 0.3 * st.savings; st.savings *= 0.7;
+  const hh = { pain: 0, legumes: 0, maisons: 0, spent: 0 };
+  const buyPublic = (t, g, need) => {
+    const A = acc[t], price = Math.max(0.1, +D[t].pubPrice || GOODS[g].ref), stock = A['left_' + g] || 0;
+    const q = r1(Math.max(0, Math.min(need, stock, budget / price)));
+    if (q <= 0) return 0;
+    const val = q * price; budget -= val; hh.spent += val; A.caPublic += val; st.teams[t].cash += val; A['left_' + g] = r1(stock - q);
+    A.sold[g] = (A.sold[g] || 0) + q; rec.flows.push({ from: t, to: 'village', g, q });
+    return q;
+  };
+  hh.pain = buyPublic('boulangerie', 'pain', st.P);
+  hh.legumes = buyPublic('ferme', 'legumes', Math.round(0.6 * st.P));
+  const wantHouses = Math.max(1, Math.ceil((1.1 * st.P - HOUSE_CAP * st.H) / HOUSE_CAP) + 1);
+  const keep = budget; budget *= 0.85;
+  hh.maisons = Math.floor(buyPublic('batisseur', 'module', wantHouses));
+  budget += keep * 0.15;
+  st.savings += Math.max(0, budget);
+  st.H += hh.maisons;
+
+  // 5. Invendus : export ou stock
+  TEAMS.forEach(t => {
+    const A = acc[t], tm = st.teams[t];
+    Object.keys(A.outputs).forEach(g => {
+      let left = A['left_' + g] || 0; if (left <= 0) return;
+      if (D[t].autoExport) { const val = left * GOODS[g].ref * EXPORT * exportMult; A.caExport += val; tm.cash += val; rec.flows.push({ from: t, to: 'monde', g, q: left }); A.exported = (A.exported || 0) + left; left = 0; }
+      if (!GOODS[g].perish) tm.out[g] = r1((tm.out[g] || 0) + left); else if (left > 0) A.lost = (A.lost || 0) + left;
+    });
+  });
+
+  // 6. Comptes de chaque équipe
+  let incomeWages = 0, incomeDiv = 0, incomeMixte = 0, mixteTotal = 0, prodTax = 0;
+  TEAMS.forEach(t => {
+    const A = acc[t], tm = st.teams[t], d = D[t], a = ACT[t];
+    const cashStart = S.teams[t].cash;
+    A.ca = A.caContracts + A.caPublic + A.caExport;
+    const rem = alloc[t] * d.wage;
+    tm.cash -= A.conso + A.imports + rem;
+    let prod, va, imp, ebe, div;
+    if (a.nonMarchand) { prod = rem + A.ci; va = prod - A.ci; imp = 0; ebe = 0; div = 0; }
+    else {
+      prod = A.ca; va = A.ca - A.ci; imp = A.ca * st.taxProd / 100; ebe = va - rem - imp;
+      div = Math.max(0, ebe) * clamp(+d.div, 0, 100) / 100; tm.cash -= imp + div;
+    }
+    const interest = cashStart < 0 ? -cashStart * 0.08 : 0; tm.cash -= interest;
+    incomeWages += rem; prodTax += imp; if (a.ei) { incomeMixte += div; mixteTotal += Math.max(0, ebe); } else incomeDiv += div;
+    const prodPerHead = alloc[t] ? A.output / alloc[t] : 0;
+    const gain = tm.lastProd ? (prodPerHead - tm.lastProd) / tm.lastProd : null;
+    tm.lastProd = prodPerHead;
+    // capital, compétences, ateliers
+    tm.tools = r1(tm.tools * (1 - DEPREC) + (tm.toolsIn || 0)); delete tm.toolsIn;
+    tm.modules += tm.modulesIn || 0; delete tm.modulesIn;
+    let levelUp = 0; while (tm.modules >= MODULES_PER_LEVEL) { tm.modules -= MODULES_PER_LEVEL; tm.level++; levelUp++; }
+    tm.workers = alloc[t]; tm.wage = d.wage;
+    rec.teams[t] = { workers: alloc[t], trainees: trainees[t], potential: A.potential, cap: A.cap, output: A.output, outputs: A.outputs, sold: A.sold,
+                     ca: A.ca, caContracts: A.caContracts, caPublic: A.caPublic, caExport: A.caExport, prod, ci: A.ci, imports: A.imports, conso: A.conso,
+                     va, rem, imp, ebe, div, interest, marge: va > 0 ? ebe / va : null, prodPerHead, gain, invest: A.invest,
+                     cash: tm.cash, tools: tm.tools, level: tm.level, levelUp, skill: tm.skill, lost: A.lost || 0, exported: A.exported || 0, subvention: A.subvention || 0 };
+  });
+
+  // 7. Formation : l'École répartit ses places
+  const places = acc.ecole.output; const asked = TEAMS.reduce((s, t) => s + trainees[t], 0);
+  const fill = asked > 0 ? Math.min(1, places / asked) : 0; let used = 0;
+  TEAMS.forEach(t => { if (t === 'ecole' || !trainees[t]) return; const tr = trainees[t] * fill; used += tr;
+    const tm = st.teams[t]; tm.skill = Math.min(1.8, Math.round((tm.skill + 0.12 * tr / alloc[t]) * 100) / 100); rec.teams[t].trained = r1(tr); rec.teams[t].skillNext = tm.skill; });
+  rec.teams.ecole.placesUsed = r1(used);
+
+  // 8. Impôts et budget de l'École
+  const income = incomeWages + incomeDiv + incomeMixte;
+  const incomeTax = income * st.taxInc / 100;
+  st.schoolBudget = Math.round(incomeTax + prodTax);
+  st.incomePrev = income;
+
+  // 9. Population
+  const foodSat = 0.65 * Math.min(1, hh.pain / st.P) + 0.35 * Math.min(1, hh.legumes / (0.6 * st.P));
+  const P0 = st.P; let dP = 0;
+  if (foodSat >= 0.9 && HOUSE_CAP * st.H > st.P) dP = Math.min(Math.ceil(0.06 * st.P), HOUSE_CAP * st.H - st.P);
+  else if (foodSat < 0.75) dP = -Math.ceil(0.05 * st.P);
+  if (ev.includes('epidemie')) dP -= Math.ceil(0.1 * st.P);
+  st.P = Math.max(20, st.P + dP);
+
+  // 10. Indicateurs du village
+  const PIB = TEAMS.reduce((s, t) => s + rec.teams[t].va, 0);
+  const pibHab = PIB / P0;
+  let wsum = 0, ssum = 0; TEAMS.forEach(t => { if (t === 'ecole') return; wsum += st.teams[t].workers; ssum += st.teams[t].skill * st.teams[t].workers; });
+  const avgSkill = wsum ? ssum / wsum : 1;
+  const iSante = foodSat, iEduc = 0.4 + 0.6 * clamp((avgSkill - 1) / 0.4, 0, 1), iVie = clamp((Math.log(Math.max(pibHab, 1)) - Math.log(5)) / (Math.log(60) - Math.log(5)), 0, 1);
+  const IDH = (iSante + iEduc + iVie) / 3;
+  const sRem = TEAMS.reduce((s, t) => s + rec.teams[t].rem, 0), sImp = TEAMS.reduce((s, t) => s + rec.teams[t].imp, 0), sEbe = TEAMS.reduce((s, t) => s + (ACT[t].ei ? 0 : rec.teams[t].ebe), 0);
+  const sumCA = TEAMS.reduce((s, t) => s + rec.teams[t].ca, 0);
+  const sMixte = rec.teams.ferme.ebe;
+  const hhIncome = { travail: incomeWages, capital: incomeDiv, mixte: incomeMixte, mixteTotal, total: income, impot: incomeTax, dispo: income - incomeTax,
+                     pain: hh.pain * (+D.boulangerie.pubPrice || 0), legumes: hh.legumes * (+D.ferme.pubPrice || 0), maisons: hh.maisons * (+D.batisseur.pubPrice || 0), spent: hh.spent };
+  rec.village = Object.assign(rec.village, { sumCA, sMixte, hh: hhIncome, PIB, pibHab, P0, P: st.P, dP, H: st.H, houses: hh.maisons, foodSat, hhPain: hh.pain, hhLeg: hh.legumes, hhSpent: hh.spent,
+    avgSkill, iSante, iEduc, iVie, IDH, sRem, sImp, sEbe, income, incomeTax, prodTax, schoolBudgetNext: st.schoolBudget, active, want, places, asked, used: r1(used),
+    imports: TEAMS.reduce((s, t) => s + rec.teams[t].imports, 0), exportsV: TEAMS.reduce((s, t) => s + rec.teams[t].caExport, 0),
+    invest: TEAMS.reduce((s, t) => s + rec.teams[t].invest, 0) });
+
+  // 11. Scores (score individuel × IDH du village)
+  TEAMS.forEach(t => {
+    const R = rec.teams[t]; let s;
+    if (t === 'ecole') s = 70 * Math.min(1.5, used / 24) + (st.teams.ecole.cash >= 0 ? 30 : 0);
+    else s = 40 * clamp(R.va / ACT[t].vaRef, 0, 2) + 30 * clamp((R.marge || 0) / 0.4, 0, 1.5) + 30 * clamp(((R.gain ?? 0) + 0.1) / 0.3, 0, 1);
+    R.points = Math.round(s * IDH); st.teams[t].score += R.points; R.score = st.teams[t].score;
+  });
+
+  st.lastDecisions = {}; TEAMS.forEach(t => { const { submitted, ...rest } = D[t]; st.lastDecisions[t] = rest; });
+  st.history.push(rec);
+  st.events = [];
+  st.phase = Y >= st.years ? 'end' : 'results';
+  st.deadline = null;
+  st.animStamp = Date.now();
+  return st;
+}
+
+/* ============================ ROBOTS ============================ */
+const isBot = (S, t) => !!(S.bots && S.bots[t]);
+const MOOD = {
+  coop: { buyOffer: 1.0, buyMax: 1.25, buyCounter: 1.0, sellMin: 0.85, sellCounter: 1.0, pub: 1.0, div: 30 },
+  dur:  { buyOffer: 0.9, buyMax: 1.05, buyCounter: 0.92, sellMin: 1.0, sellCounter: 1.15, pub: 1.15, div: 50 },
+};
+function botDecision(S, t) {
+  const tm = S.teams[t], a = ACT[t], M = MOOD[S.bots[t]] || MOOD.coop;
+  const d = defaultDecision(S, t);
+  d.wage = Math.max(WAGE_MIN, 15);
+  d.train = (t !== 'ecole' && tm.workers >= 5 && tm.cash > 150 && tm.skill < 1.4) ? 1 : 0;
+  d.div = M.div; d.target = 0; d.autoImport = true; d.autoExport = true;
+  if (a.pub) d.pubPrice = Math.round(GOODS[a.pub].ref * M.pub * 100) / 100;
+  if (t === 'ferme') { const pot = potentialOf(t, tm, d.workers, d.train, S.events || []).potential || 1; d.blePct = Math.round(clamp(100 * (1 - 0.6 * S.P / pot), 50, 90)); }
+  if (t === 'batisseur') { d.target = 2; d.pubPrice = Math.round(GOODS.module.ref * (S.bots[t] === 'dur' ? 1.0 : 0.85)); }
+  d.submitted = true; d.bot = true;
+  return d;
+}
+/* Renvoie une liste d'actions : {kind:'create', offer} | {kind:'update', id, patch} */
+function botActions(S, offers0, decisions, now) {
+  const offers = offers0.map(o => ({ ...o }));
+  const acts = [];
+  const push = a => { acts.push(a);
+    if (a.kind === 'update') { const o = offers.find(x => x.id === a.id); if (o) Object.assign(o, a.patch); }
+    else offers.push({ ...a.offer, id: 'tmp' + acts.length, created: now }); };
+  const bots = TEAMS.filter(t => isBot(S, t));
+  bots.forEach(t => {
+    const tm = S.teams[t], a = ACT[t], M = MOOD[S.bots[t]] || MOOD.coop;
+    const d = decisions[t] || botDecision(S, t);
+    const P = potentialOf(t, tm, d.workers, d.train || 0, S.events || []);
+    const target = Math.min(P.potential, P.cap, +d.target > 0 ? +d.target : Infinity);
+    // 1. Répondre aux offres reçues (après un petit délai « de réflexion »)
+    offers.filter(o => o.status === 'pending' && o.author !== t && (o.seller === t || o.buyer === t) && now - (o.created || 0) > 2500).forEach(o => {
+      const ref = GOODS[o.good].ref, rounds = offers.filter(x => x.author === t && x.good === o.good && x.seller === o.seller && x.buyer === o.buyer).length;
+      if (o.seller === t) {
+        const committed = offers.filter(x => x.seller === t && x.good === o.good && x.status === 'accepted').reduce((s, x) => s + +x.qty, 0);
+        let room = (o.good === 'ble' ? target * 0.85 : target) + (tm.out[o.good] || 0) - committed;
+        room = Math.floor(room * 10) / 10;
+        if (room <= 0) { push({ kind: 'update', id: o.id, patch: { status: 'refused' } }); return; }
+        const qty = Math.min(+o.qty, room);
+        if (+o.price >= ref * M.sellMin && qty >= +o.qty) push({ kind: 'update', id: o.id, patch: { status: 'accepted' } });
+        else if (+o.price < ref * EXPORT || rounds >= 3) push({ kind: 'update', id: o.id, patch: { status: +o.price >= ref * M.sellMin * 0.9 && qty >= +o.qty ? 'accepted' : 'refused' } });
+        else { const p = Math.max(+o.price, Math.round(((+o.price + ref * M.sellCounter) / 2) * 100) / 100);
+          push({ kind: 'update', id: o.id, patch: { status: 'countered' } });
+          push({ kind: 'create', offer: { year: S.year, seller: o.seller, buyer: o.buyer, good: o.good, qty: r1(qty), price: p, status: 'pending', author: t } }); }
+      } else {
+        const inRecipe = a.recipe[o.good] !== undefined;
+        const need = inRecipe ? Math.max(0, target * a.recipe[o.good] - ((tm.inv[o.good] && tm.inv[o.good].q) || 0)
+          - offers.filter(x => x.buyer === t && x.good === o.good && x.status === 'accepted').reduce((s, x) => s + +x.qty, 0)) : (tm.cash > 200 ? 3 : 0);
+        if (need <= 0.05) { push({ kind: 'update', id: o.id, patch: { status: 'refused' } }); return; }
+        const qty = Math.min(+o.qty, Math.ceil(need * 1.05 * 10) / 10);
+        if (+o.price <= ref * M.buyMax && qty >= +o.qty * 0.95) push({ kind: 'update', id: o.id, patch: { status: 'accepted' } });
+        else if (+o.price > ref * IMPORT || rounds >= 3) push({ kind: 'update', id: o.id, patch: { status: +o.price <= ref * M.buyMax * 1.1 ? 'accepted' : 'refused' } });
+        else { const p = Math.min(+o.price, Math.round(((+o.price + ref * M.buyCounter) / 2) * 100) / 100);
+          push({ kind: 'update', id: o.id, patch: { status: 'countered' } });
+          push({ kind: 'create', offer: { year: S.year, seller: o.seller, buyer: o.buyer, good: o.good, qty: r1(qty), price: p, status: 'pending', author: t } }); }
+      }
+    });
+    // 2. Acheter ses intrants (une seule offre active par produit)
+    Object.entries(a.recipe).forEach(([g, q]) => {
+      const seller = sellerOf(g); if (!seller || seller === t) return;
+      const mine = offers.filter(x => x.buyer === t && x.good === g);
+      if (mine.some(x => x.status === 'pending')) return;
+      const secured = mine.filter(x => x.status === 'accepted').reduce((s, x) => s + +x.qty, 0);
+      const refusedTwice = mine.filter(x => x.status === 'refused').length >= 2;
+      const need = r1(target * q - ((tm.inv[g] && tm.inv[g].q) || 0) - secured);
+      if (need >= 1 && !refusedTwice) push({ kind: 'create', offer: { year: S.year, seller, buyer: t, good: g, qty: Math.ceil(need), price: Math.round(GOODS[g].ref * M.buyOffer * 100) / 100, status: 'pending', author: t } });
+    });
+    // 3. Investir : quelques outils si la trésorerie le permet
+    if (t !== 'forge' && a.recipe.outils === undefined && tm.cash > 250 && tm.tools < TOOLS_PER_WORKER * tm.workers * 0.6) {
+      const mine = offers.filter(x => x.buyer === t && x.good === 'outils');
+      if (!mine.length) push({ kind: 'create', offer: { year: S.year, seller: 'forge', buyer: t, good: 'outils', qty: 2, price: Math.round(GOODS.outils.ref * M.buyOffer * 100) / 100, status: 'pending', author: t } });
+    }
+    // 4. Agrandir l'atelier s'il est saturé
+    if (t !== 'batisseur' && P.potential >= P.cap * 0.95 && tm.cash > 350 && !offers.some(x => x.buyer === t && x.good === 'module'))
+      push({ kind: 'create', offer: { year: S.year, seller: 'batisseur', buyer: t, good: 'module', qty: 2, price: Math.round(GOODS.module.ref * M.buyOffer), status: 'pending', author: t } });
+  });
+  return acts;
+}
+
+/* Estimation affichée à l'équipe pendant qu'elle décide */
+function estimate(S, t, d, offers) {
+  const a = ACT[t], tm = S.teams[t];
+  const active = Math.floor(0.75 * S.P);
+  const workers = Math.max(1, Math.round(+d.workers || 1)), trainees = t === 'ecole' ? 0 : clamp(Math.round(+d.train || 0), 0, workers);
+  const P = potentialOf(t, tm, workers, trainees, S.events || []);
+  let target = Math.min(P.potential, P.cap); if (+d.target > 0) target = Math.min(target, +d.target);
+  const acc = offers.filter(o => o.status === 'accepted');
+  const inputs = {}; let out = target, ci = 0, impCost = 0;
+  Object.entries(a.recipe).forEach(([g, q]) => {
+    const need = r1(target * q);
+    const fromStock = (tm.inv[g] && tm.inv[g].q) || 0;
+    const contr = acc.filter(o => o.buyer === t && o.good === g);
+    const fromContracts = contr.reduce((s, o) => s + +o.qty, 0);
+    const contrVal = contr.reduce((s, o) => s + o.qty * o.price, 0);
+    let have = fromStock + fromContracts, imp = 0;
+    if (have < need && d.autoImport) { imp = r1(need - have); impCost += imp * GOODS[g].ref * IMPORT; have = need; }
+    out = Math.min(out, q > 0 ? have / q : Infinity);
+    const unitCost = fromContracts > 0 ? contrVal / fromContracts : (tm.inv[g] && tm.inv[g].q ? tm.inv[g].v / tm.inv[g].q : GOODS[g].ref);
+    ci += Math.min(need, fromStock + fromContracts) * unitCost + imp * GOODS[g].ref * IMPORT;
+    inputs[g] = { need, fromStock, fromContracts, imp };
+  });
+  out = Math.max(0, out); ci += out * a.conso;
+  let ca = 0, salesNote = [];
+  if (t === 'ferme') {
+    const ble = out * d.blePct / 100, leg = out - ble;
+    const cs = acc.filter(o => o.seller === t); let rest = ble;
+    cs.forEach(o => { const q = Math.min(o.qty, rest); rest -= q; ca += q * o.price; });
+    const legSold = Math.min(leg, Math.round(0.6 * S.P)); ca += legSold * d.pubPrice;
+    ca += (rest + (leg - legSold)) * (d.autoExport ? GOODS.ble.ref * EXPORT : 0);
+  } else if (a.sells.length) {
+    const g = a.sells[0]; let rest = out + (tm.out[g] || 0);
+    acc.filter(o => o.seller === t).forEach(o => { const q = Math.min(o.qty, rest); rest -= q; ca += q * o.price; });
+    if (a.pub) { const need = g === 'pain' ? S.P : Math.max(1, Math.ceil((1.1 * S.P - HOUSE_CAP * S.H) / HOUSE_CAP) + 1); const q = Math.min(rest, need); ca += q * d.pubPrice; rest -= q; }
+    if (d.autoExport) ca += rest * GOODS[g].ref * EXPORT;
+  }
+  const rem = workers * Math.max(WAGE_MIN, +d.wage);
+  const va = a.nonMarchand ? rem : ca - ci;
+  const imp = a.nonMarchand ? 0 : ca * S.taxProd / 100;
+  const ebe = a.nonMarchand ? 0 : va - rem - imp;
+  const invest = acc.filter(o => o.buyer === t && a.recipe[o.good] === undefined).reduce((s, o) => s + o.qty * o.price, 0);
+  return { workers, trainees, active, potential: P.potential, cap: P.cap, effT: P.effT, target, out: r1(out), inputs, ci, impCost, ca, rem, va, imp, ebe, invest,
+           marge: va > 0 ? ebe / va : null, prodPerHead: out / workers, limit: out < target - 0.05 ? 'intrants' : (target >= P.cap - 0.05 && P.potential > P.cap ? 'atelier' : null) };
+}
+</script>
+<script>
+/* ===================== RENDU ISOMÉTRIQUE DU VILLAGE ===================== */
+const GRID = 18;
+const SITES = { ecole: [6, 6], ferme: [1, 1], scierie: [15, 1], forge: [11, 6], boulangerie: [11, 11], batisseur: [6, 11] };
+function buildMap() {
+  const road = new Set(), used = new Set(), crop = [], forest = [], water = [];
+  const key = (x, y) => x + ',' + y;
+  for (let i = 0; i < GRID; i++) { road.add(key(i, 9)); road.add(key(9, i)); }
+  for (let i = 4; i <= 14; i++) { road.add(key(i, 4)); road.add(key(i, 14)); road.add(key(4, i)); road.add(key(14, i)); }
+  Object.values(SITES).forEach(([x, y]) => { for (let dx = 0; dx < 2; dx++) for (let dy = 0; dy < 2; dy++) used.add(key(x + dx, y + dy)); });
+  for (let x = 15; x < 18; x++) for (let y = 15; y < 18; y++) { water.push([x, y]); used.add(key(x, y)); }
+  for (let x = 0; x < 8; x++) for (let y = 0; y < 4; y++) { const k = key(x, y); if (!road.has(k) && !used.has(k)) { crop.push([x, y]); used.add(k); } }
+  for (let x = 0; x < 3; x++) for (let y = 4; y < 8; y++) { const k = key(x, y); if (!road.has(k) && !used.has(k)) { crop.push([x, y]); used.add(k); } }
+  for (let x = 11; x < 18; x++) for (let y = 0; y < 4; y++) { const k = key(x, y); if (!road.has(k) && !used.has(k)) { forest.push([x, y]); used.add(k); } }
+  for (let x = 15; x < 18; x++) for (let y = 4; y < 9; y++) { const k = key(x, y); if (!road.has(k) && !used.has(k)) { forest.push([x, y]); used.add(k); } }
+  const houses = [];
+  for (let x = 0; x < GRID; x++) for (let y = 0; y < GRID; y++) {
+    const k = key(x, y); if (road.has(k) || used.has(k)) continue;
+    if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => road.has(key(x + dx, y + dy)))) houses.push([x, y]);
+  }
+  houses.sort((a, b) => Math.hypot(a[0] - 9.5, a[1] - 9.5) - Math.hypot(b[0] - 9.5, b[1] - 9.5));
+  return { road, used, crop, forest, water, houses, key };
+}
+const MAP = buildMap();
+function nearestRoad(x, y) {
+  let best = null, bd = 1e9;
+  MAP.road.forEach(k => { const [a, b] = k.split(',').map(Number); const d = Math.abs(a - x) + Math.abs(b - y); if (d < bd) { bd = d; best = [a, b]; } });
+  return best;
+}
+const pathCache = {};
+function roadPath(a, b) {
+  const k = a + '>' + b; if (pathCache[k]) return pathCache[k];
+  const start = a.join(','), goal = b.join(','); const prev = { [start]: null }; const q = [start];
+  while (q.length) { const c = q.shift(); if (c === goal) break; const [x, y] = c.split(',').map(Number);
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const n = (x + dx) + ',' + (y + dy); if (MAP.road.has(n) && !(n in prev)) { prev[n] = c; q.push(n); } }); }
+  const path = []; let c = goal; if (!(goal in prev)) return pathCache[k] = [a, b];
+  while (c) { path.unshift(c.split(',').map(Number)); c = prev[c]; }
+  return pathCache[k] = path;
+}
+const doorOf = t => { const [x, y] = SITES[t]; return nearestRoad(x + 1, y + 1); };
+const EXIT = [0, 9];
+
+function shade(hex, f) { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  const m = v => Math.round(clamp(f >= 0 ? v + (255 - v) * f : v * (1 + f), 0, 255)); return `rgb(${m(r)},${m(g)},${m(b)})`; }
+function mix(a, b, t) { const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const c = (s) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t); return '#' + [16, 8, 0].map(s => c(s).toString(16).padStart(2, '0')).join(''); }
+function seasonAt(t) { // t ∈ [0,1]
+  const keys = [['#7DB565', '#4E8F3A'], ['#8BB352', '#3F7F2E'], ['#B3A350', '#C98A2E'], ['#D8E2E4', '#9AA5A0']];
+  const f = clamp(t, 0, 0.999) * 4, i = Math.floor(f), u = f - i, j = Math.min(3, i + 1);
+  return { grass: mix(keys[i][0], keys[j][0], u), tree: mix(keys[i][1], keys[j][1], u), idx: i, crop: t };
+}
+
+function createVillage(canvas, opts = {}) {
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0, dpr = 1, S = null, cam = { x: 0, y: 0, z: 1, o: 0 }, camT = { x: 0, y: 0, z: 1, o: 0 }, focus = null, clouds = [0.1, 0.45, 0.8].map((x, i) => ({ x, y: 0.12 + i * 0.07, s: 0.6 + i * 0.25 }));
+  let anim = null, villagers = [], carts = [], floats = [], smoke = [], last = performance.now(), running = true;
+  const TW = 64, TH = 32;
+  function resize() { const r = canvas.getBoundingClientRect(); dpr = window.devicePixelRatio || 1; W = r.width; H = r.height; canvas.width = W * dpr; canvas.height = H * dpr; }
+  const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
+  function baseScale() { const ww = GRID * TW + 60, hh = GRID * TH + 120; return Math.min(W / ww, (H - (opts.padTop || 0) - (opts.padBottom || 0)) / hh); }
+  function P(x, y, z = 0) {
+    const s = baseScale() * cam.z;
+    const cx = W / 2 - cam.x * s - cam.o, cy = (opts.padTop || 0) + ((H - (opts.padTop || 0) - (opts.padBottom || 0)) / 2) - (GRID * TH / 2) * s + 45 * s - cam.y * s;
+    return [cx + (x - y) * TW / 2 * s, cy + (x + y) * TH / 2 * s - z * s];
+  }
+  const sc = () => baseScale() * cam.z;
+  function poly(pts, fill, stroke) { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.stroke(); } }
+  function tile(x, y, c, stroke) { poly([P(x, y), P(x + 1, y), P(x + 1, y + 1), P(x, y + 1)], c, stroke); }
+  function box(x, y, w, d, h, top, left, right, z0 = 0) {
+    poly([P(x, y + d, z0), P(x + w, y + d, z0), P(x + w, y + d, z0 + h), P(x, y + d, z0 + h)], left);
+    poly([P(x + w, y, z0), P(x + w, y + d, z0), P(x + w, y + d, z0 + h), P(x + w, y, z0 + h)], right);
+    poly([P(x, y, z0 + h), P(x + w, y, z0 + h), P(x + w, y + d, z0 + h), P(x, y + d, z0 + h)], top);
+  }
+  function roof(x, y, w, d, h, rh, c) {
+    const ap = P(x + w / 2, y + d / 2, h + rh);
+    poly([P(x, y, h), P(x + w, y, h), ap], shade(c, 0.15)); poly([P(x, y, h), P(x, y + d, h), ap], shade(c, 0.05));
+    poly([P(x, y + d, h), P(x + w, y + d, h), ap], c); poly([P(x + w, y, h), P(x + w, y + d, h), ap], shade(c, -0.25));
+  }
+  function emoji(e, x, y, z, size) { const [sx, sy] = P(x, y, z); ctx.font = `${size * sc()}px "Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e, sx, sy); }
+  function label(txt, x, y, z, bg) {
+    const [sx, sy] = P(x, y, z); const s = sc(); ctx.font = `700 ${Math.max(11, 14 * s)}px Fredoka, sans-serif`;
+    const w = ctx.measureText(txt).width + 14 * s; ctx.fillStyle = bg; ctx.beginPath(); ctx.roundRect(sx - w / 2, sy - 12 * s, w, 24 * s, 10 * s); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, sx, sy + 1);
+  }
+
+  function setState(st) {
+    const firstTime = !S; S = st;
+    const P0 = st.history.length ? st.history[st.history.length - 1].village.P : st.P;
+    const n = Math.min(st.P, 90);
+    const housesN = Math.min(MAP.houses.length, st.H);
+    const jobs = []; TEAMS.forEach(t => { const w = st.teams[t].workers; for (let i = 0; i < w; i++) jobs.push(t); });
+    while (villagers.length < n) villagers.push({ seed: Math.random(), pos: 0, dir: 1, wait: Math.random() * 3, off: (Math.random() - .5) * .5 });
+    villagers.length = n;
+    villagers.forEach((v, i) => {
+      v.home = MAP.houses[i % Math.max(1, housesN)] || [9, 9]; v.job = jobs[i] || null;
+      const a = nearestRoad(v.home[0], v.home[1]), b = v.job ? doorOf(v.job) : [9 + Math.round(Math.random() * 2 - 1), 9];
+      v.path = roadPath(a, b); if (v.pos > v.path.length - 1) v.pos = 0;
+      v.color = v.job ? ACT[v.job].color : '#9AA5B1';
+    });
+  }
+  function play(rec, duration = 16000) {
+    anim = { t0: performance.now(), dur: duration, rec };
+    carts = []; floats = [];
+    const per = { ble: 25, legumes: 15, bois: 20, outils: 3, pain: 25, module: 1 };
+    rec.flows.forEach((f, i) => {
+      if (!GOODS[f.g] || f.q <= 0) return;
+      const nC = clamp(Math.ceil(f.q / per[f.g]), 1, f.to === 'village' ? 6 : 3);
+      for (let k = 0; k < nC; k++) {
+        let a = f.from === 'monde' ? EXIT : doorOf(f.from);
+        let b = f.to === 'monde' ? EXIT : f.to === 'village' ? nearestRoad(...(MAP.houses[Math.floor(Math.random() * Math.min(MAP.houses.length, S.H))] || [9, 9])) : doorOf(f.to);
+        carts.push({ path: roadPath(a, b), em: GOODS[f.g].em, start: 0.08 + Math.random() * 0.62, len: 0.18 + Math.random() * 0.08, world: f.from === 'monde' || f.to === 'monde' });
+      }
+    });
+    TEAMS.forEach(t => { const R = rec.teams[t]; const [x, y] = SITES[t];
+      if (R.output > 0) floats.push({ x: x + 1, y: y + 1, txt: '+' + fmt(R.output, R.output < 10 ? 1 : 0) + ' ' + (ACT[t].sells[0] ? GOODS[ACT[t].sells[0]].em : '🎓'), at: 0.55, team: t });
+      if (R.levelUp) floats.push({ x: x + 1, y: y + 1, txt: 'Atelier niveau ' + R.level + ' !', at: 0.8, team: t });
+    });
+  }
+  function setFocus(t) { focus = t; if (!t) camT = { x: 0, y: 0, z: 1, o: 0 }; else { const [x, y] = SITES[t]; camT = { x: (x + 1 - (y + 1)) * TW / 2, y: (x + y + 2 - GRID) * TH / 2 - 20, z: 1.9, o: opts.focusOffset || 0 }; } }
+
+  function frame(now) {
+    if (!running) return;
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    cam.x += (camT.x - cam.x) * Math.min(1, dt * 3); cam.y += (camT.y - cam.y) * Math.min(1, dt * 3); cam.z += (camT.z - cam.z) * Math.min(1, dt * 3); cam.o += (camT.o - cam.o) * Math.min(1, dt * 3);
+    let tYear = null; if (anim) { tYear = (now - anim.t0) / anim.dur; if (tYear >= 1) { anim = null; tYear = null; carts = []; if (opts.onAnimEnd) opts.onAnimEnd(); } }
+    if (opts.onSeason) opts.onSeason(tYear);
+    draw(tYear, dt, now);
+    requestAnimationFrame(frame);
+  }
+  function draw(tYear, dt, now) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const se = seasonAt(tYear == null ? 0.3 : tYear);
+    const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, opts.sky1 || '#1B2A47'); g.addColorStop(1, opts.sky2 || '#2E4A5C');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(255,255,255,.07)'; clouds.forEach(c => { c.x += dt * 0.004 * c.s; if (c.x > 1.2) c.x = -0.2; const cx = c.x * W, cy = c.y * H, r = 40 * c.s * (W / 1400 + .4);
+      ctx.beginPath(); ctx.ellipse(cx, cy, r * 2.2, r * .7, 0, 0, 7); ctx.ellipse(cx + r, cy - r * .35, r * 1.2, r * .6, 0, 0, 7); ctx.fill(); });
+    // socle
+    const s = sc();
+    poly([P(0, GRID, 0), P(GRID, GRID, 0), P(GRID, GRID, -22), P(0, GRID, -22)], '#6B4F33');
+    poly([P(GRID, 0, 0), P(GRID, GRID, 0), P(GRID, GRID, -22), P(GRID, 0, -22)], '#4F3A26');
+    for (let x = 0; x < GRID; x++) for (let y = 0; y < GRID; y++) {
+      const k = MAP.key(x, y);
+      if (MAP.road.has(k)) tile(x, y, (x === 9 && y === 9) ? '#D9C9A3' : '#CDB98E', 'rgba(0,0,0,.05)');
+      else { tile(x, y, ((x + y) % 2 ? se.grass : shade(se.grass, -0.04)));
+        if (!MAP.used.has(k) && ((x * 7 + y * 13) % 5 === 0) && se.idx < 3) { const [fx, fy] = P(x + .3 + ((x * 3) % 4) / 10, y + .5, 0); ctx.fillStyle = ['#F2D16B', '#F49AC1', '#FFFFFF'][(x + y) % 3]; [[0, 0], [5, 2], [-4, 3]].forEach(([dx, dy]) => { ctx.beginPath(); ctx.arc(fx + dx * s, fy + dy * s, 1.6 * s, 0, 7); ctx.fill(); }); } }
+    }
+    MAP.water.forEach(([x, y]) => tile(x, y, se.idx === 3 ? '#BFD9E6' : '#4C9BC4', 'rgba(255,255,255,.15)'));
+    // champs
+    const cropOk = S ? (S.history.length ? (S.history[S.history.length - 1].teams.ferme.output > 0) : true) : true;
+    const drought = anim && anim.rec.events.includes('secheresse');
+    MAP.crop.forEach(([x, y], i) => {
+      const t = tYear == null ? 0.3 : tYear;
+      let c = t < 0.25 ? mix('#7A5B3A', '#7DAF4F', t * 4) : t < 0.5 ? '#6FA33E' : t < 0.75 ? mix('#6FA33E', '#E3B341', (t - 0.5) * 4) : '#8A6A45';
+      if (drought && t > 0.3 && t < 0.75) c = mix(c, '#C9B27A', 0.6);
+      tile(x, y, cropOk ? c : '#8A6A45', 'rgba(0,0,0,.08)');
+      if (t > 0.15 && t < 0.75 && cropOk) for (let r = 0; r < 3; r++) { const [a, b] = P(x + 0.2 + r * 0.3, y + 0.5, 0); ctx.strokeStyle = shade(c, -0.25); ctx.lineWidth = Math.max(1, 1.5 * s); ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(a, b - (4 + 6 * Math.min(1, t * 2)) * s); ctx.stroke(); }
+    });
+    // objets triés par profondeur
+    const objs = [];
+    const fire = anim && anim.rec.events.includes('incendie') && tYear > 0.2 && tYear < 0.6;
+    const treesUp = S ? clamp(Math.round(MAP.forest.length * (0.55 + 0.45 * Math.min(1, (S.teams.scierie.level + 1) / 3))), 6, MAP.forest.length) : MAP.forest.length;
+    MAP.forest.forEach(([x, y], i) => { if (i < treesUp) objs.push({ d: x + y + 1, f: () => tree(x, y, se, fire && i % 3 === 0) }); else objs.push({ d: x + y, f: () => stump(x, y) }); });
+    const hN = S ? Math.min(MAP.houses.length, S.H) : 10;
+    MAP.houses.slice(0, hN).forEach(([x, y], i) => objs.push({ d: x + y + 1, f: () => house(x, y, i, se) }));
+    TEAMS.forEach(t => { const [x, y] = SITES[t]; objs.push({ d: x + y + 3.2, f: () => building(t, x, y, se, now) }); });
+    objs.push({ d: 19, f: () => fountain(9, 9) });
+    villagers.forEach(v => { const p = vPos(v, dt); if (p) objs.push({ d: p[0] + p[1] + 0.6, f: () => person(p[0], p[1], v.color) }); });
+    if (tYear != null) carts.forEach(c => { const u = (tYear - c.start) / c.len; if (u < 0 || u > 1) return; const p = along(c.path, u); objs.push({ d: p[0] + p[1] + 0.7, f: () => cart(p[0], p[1], c.em, c.world) }); });
+    objs.sort((a, b) => a.d - b.d).forEach(o => o.f());
+    // fumée
+    smoke = smoke.filter(p => (p.life -= dt) > 0);
+    smoke.forEach(p => { p.z += 18 * dt; p.x += 0.12 * dt; const [sx, sy] = P(p.x, p.y, p.z); ctx.fillStyle = `rgba(230,230,230,${0.35 * p.life / 3})`; ctx.beginPath(); ctx.arc(sx, sy, (3 + (3 - p.life) * 3) * s, 0, 7); ctx.fill(); });
+    // textes flottants
+    if (tYear != null) floats.forEach(f => { const u = (tYear - f.at) / 0.18; if (u < 0 || u > 1) return; ctx.globalAlpha = u < .8 ? 1 : (1 - u) * 5; label(f.txt, f.x, f.y, 150 + u * 50, ACT[f.team].color); ctx.globalAlpha = 1; });
+    // étiquettes des bâtiments
+    TEAMS.forEach(t => { const [x, y] = SITES[t]; const lv = S ? S.teams[t].level : 1; if (opts.labels !== false) label(ACT[t].name, x + 1, y + 1, 112 + Math.min(lv, 5) * 12, shade(ACT[t].color, -0.25)); });
+  }
+  function vPos(v, dt) {
+    if (!v.path || v.path.length < 2) return null;
+    if (v.wait > 0) { v.wait -= dt; } else {
+      v.pos += v.dir * dt * (1.6 + v.seed);
+      if (v.pos >= v.path.length - 1) { v.pos = v.path.length - 1; v.dir = -1; v.wait = 2 + v.seed * 4; }
+      if (v.pos <= 0) { v.pos = 0; v.dir = 1; v.wait = 1 + v.seed * 3; }
+    }
+    const p = along(v.path, v.pos / (v.path.length - 1));
+    return [p[0] + v.off * 0.6, p[1] - v.off * 0.6];
+  }
+  function along(path, u) {
+    if (path.length === 1) return [path[0][0] + .5, path[0][1] + .5];
+    const f = clamp(u, 0, 1) * (path.length - 1), i = Math.min(path.length - 2, Math.floor(f)), k = f - i;
+    return [path[i][0] + (path[i + 1][0] - path[i][0]) * k + .5, path[i][1] + (path[i + 1][1] - path[i][1]) * k + .5];
+  }
+  function person(x, y, c) { const s = sc(); const [sx, sy] = P(x, y, 0); const s2 = s * 1.25;
+    ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.beginPath(); ctx.ellipse(sx, sy, 3.5 * s2, 1.8 * s2, 0, 0, 7); ctx.fill();
+    ctx.fillStyle = c; ctx.beginPath(); ctx.roundRect(sx - 2.6 * s2, sy - 10 * s2, 5.2 * s2, 9 * s2, 2 * s2); ctx.fill();
+    ctx.fillStyle = '#F2C9A0'; ctx.beginPath(); ctx.arc(sx, sy - 12.5 * s2, 2.6 * s2, 0, 7); ctx.fill(); }
+  function cart(x, y, em, world) { const s = sc();
+    box(x - .28, y - .2, .56, .4, 9, world ? '#9AA5B1' : '#C08A4E', world ? '#6B7480' : '#8E6232', world ? '#7F8994' : '#A87440', 2);
+    emoji(em, x, y, 28, 20); }
+  function tree(x, y, se, burning) { const s = sc(); const [sx, sy] = P(x + .5, y + .5, 0);
+    ctx.fillStyle = '#6B4A2B'; ctx.fillRect(sx - 1.5 * s, sy - 8 * s, 3 * s, 8 * s);
+    ctx.fillStyle = burning ? '#C2471F' : se.tree; ctx.beginPath(); ctx.moveTo(sx, sy - 34 * s); ctx.lineTo(sx + 11 * s, sy - 7 * s); ctx.lineTo(sx - 11 * s, sy - 7 * s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.beginPath(); ctx.moveTo(sx, sy - 34 * s); ctx.lineTo(sx - 11 * s, sy - 7 * s); ctx.lineTo(sx - 2 * s, sy - 7 * s); ctx.closePath(); ctx.fill();
+    if (burning) emoji('🔥', x + .5, y + .5, 30, 14); }
+  function stump(x, y) { box(x + .4, y + .4, .2, .2, 4, '#B08860', '#6B4A2B', '#7E5733'); }
+  function house(x, y, i, se) { const cols = ['#C65D4A', '#4F7CAC', '#7A9A4B', '#B2793C', '#8A5D9E'];
+    box(x + .2, y + .2, .6, .6, 16, '#EFE3C8', '#DCCBA6', '#C4B188'); roof(x + .2, y + .2, .6, .6, 16, 12, cols[i % cols.length]);
+    if (se.idx === 3) { poly([P(x + .2, y + .2, 16), P(x + .8, y + .2, 16), P(x + .5, y + .5, 28)], 'rgba(255,255,255,.7)'); } }
+  function fountain(x, y) { box(x + .25, y + .25, .5, .5, 6, '#9FC6DA', '#8C8C8C', '#7A7A7A'); box(x + .45, y + .45, .1, .1, 16, '#BBB', '#999', '#888'); }
+  function building(t, x, y, se, now) {
+    const a = ACT[t], lv = S ? S.teams[t].level : 1, h = 38 + 12 * (Math.min(lv, 5) - 1);
+    const hi = focus === t;
+    if (hi) { const pulse = 0.4 + 0.3 * Math.sin(now / 300); poly([P(x - .15, y - .15), P(x + 2.15, y - .15), P(x + 2.15, y + 2.15), P(x - .15, y + 2.15)], `rgba(226,169,59,${pulse})`); }
+    if (lv >= 2) { box(x + 1.3, y + 1.35, .65, .6, 16, '#E8DCC1', '#D5C39C', '#BFAA80'); roof(x + 1.3, y + 1.35, .65, .6, 16, 9, shade(a.color, -0.1)); }
+    if (lv >= 3) { box(x + .05, y + 1.35, .6, .6, 14, '#E8DCC1', '#D5C39C', '#BFAA80'); roof(x + .05, y + 1.35, .6, .6, 14, 8, shade(a.color, -0.1)); }
+    box(x + .15, y + .15, 1.6, 1.3, h, '#F0E5CC', '#E0CFAA', '#C9B48B');
+    const [dx0, dy0] = P(x + .95, y + 1.45, 0); ctx.fillStyle = '#5A3E2B'; ctx.fillRect(dx0 - 4 * sc(), dy0 - 15 * sc(), 8 * sc(), 13 * sc());
+    // fenêtres
+    for (let k = 0; k < 2; k++) { const [wx, wy] = P(x + .5 + k * .6, y + 1.4, h * 0.55); ctx.fillStyle = '#3A4A63'; ctx.fillRect(wx - 3 * sc(), wy - 4 * sc(), 6 * sc(), 7 * sc()); }
+    if (t === 'forge' || t === 'boulangerie') { box(x + 1.3, y + .4, .2, .2, h + 22, '#8C6E5A', '#6E5444', '#5D4638');
+      if (S && S.history.length && Math.random() < 0.12) smoke.push({ x: x + 1.4, y: y + .5, z: h + 24, life: 3 }); }
+    roof(x + .15, y + .15, 1.6, 1.3, h, 26 + lv * 2, a.color);
+    if (t === 'ecole') { const [fx, fy] = P(x + .95, y + .8, h + 22); ctx.strokeStyle = '#555'; ctx.lineWidth = 2 * sc(); ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 26 * sc()); ctx.stroke(); ctx.fillStyle = '#3C6FB6'; ctx.fillRect(fx, fy - 26 * sc(), 14 * sc(), 9 * sc()); }
+    if (t === 'scierie') { const [lx, ly] = P(x + 1.9, y + .5, 0); for (let k = 0; k < 3; k++) { ctx.fillStyle = '#9C6B3F'; ctx.fillRect(lx - 9 * sc(), ly - (4 + k * 4) * sc(), 18 * sc(), 3.5 * sc()); } }
+    emoji(a.em, x + .95, y + .8, h + 50 + lv * 2, 26);
+  }
+  requestAnimationFrame(frame);
+  return { setState, play, setFocus, isPlaying: () => !!anim, destroy() { running = false; ro.disconnect(); } };
+}
+</script>
+<script>
+/* ============================ INTERFACES ============================ */
+const store = makeStore();
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const show = id => { ['home', 'team', 'prof', 'proj'].forEach(x => $('#' + x).classList.toggle('hidden', x !== id)); };
+const genCode = () => Array.from({ length: 5 }, () => 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 31)]).join('');
+const phaseTxt = S => S.phase === 'lobby' ? 'En attente du lancement' : S.phase === 'open' ? 'Négociations et décisions ouvertes' : S.phase === 'results' ? `Résultats de l'année ${S.year}` : 'Partie terminée';
+const teamBadge = t => `<span style="color:${ACT[t].color};font-weight:800">${ACT[t].em} ${ACT[t].name}</span>`;
+const lastRec = S => S.history.length ? S.history[S.history.length - 1] : null;
+function timerTxt(S) { if (S.phase !== 'open' || !S.deadline) return ''; const s = Math.max(0, Math.round((S.deadline - Date.now()) / 1000)); return `⏳ ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+function debounce(f, ms) { let h; return (...a) => { clearTimeout(h); h = setTimeout(() => f(...a), ms); }; }
+
+if (store.mode === 'local') { const b = $('#modeBanner'); b.classList.remove('hidden'); b.innerHTML = '<b>Mode démo local :</b> la synchronisation fonctionne entre les onglets de ce navigateur uniquement. Renseignez Supabase dans le fichier pour jouer sur plusieurs postes.'; }
+
+/* ----------------------------- RÈGLES ----------------------------- */
+function rulesHTML() {
+  return `
+  <p><b>Le but :</b> faire prospérer votre activité <i>et</i> le village. Votre score de chaque année = votre score individuel × l'IDH du village. Écraser vos partenaires sur les prix peut vous rapporter… mais si le village s'appauvrit, tout le monde perd.</p>
+  <h4>1. Produire : combiner des facteurs</h4>
+  <p>Production possible = (travailleurs × productivité d'un travailleur + outils utilisés × productivité d'un outil) × compétence.<br>
+  Un travailleur peut utiliser au plus ${TOOLS_PER_WORKER} outils : des outils sans travailleurs ne produisent rien (<b>complémentarité</b>), mais plus d'outils permettent de produire autant avec moins de monde (<b>substitution</b>). Les outils s'usent de ${DEPREC * 100} % par an. La production est aussi limitée par la taille de votre atelier.</p>
+  <h4>2. Les consommations intermédiaires</h4>
+  <p>Chaque unité produite exige des intrants achetés aux autres équipes (bois, blé, pain, outils pour le Bâtisseur) et des consommables achetés à l'extérieur. Ce sont vos <b>CI</b>. S'il vous en manque, vous pouvez importer depuis le reste du monde, mais à ${IMPORT}× le prix de référence.</p>
+  <h4>3. Négocier</h4>
+  <p>Envoyez des offres (quantité, prix unitaire) aux équipes concernées. Un contrat accepté est exécuté en fin d'année, dans la limite de ce que le vendeur a réellement produit. Les invendus peuvent partir à l'export, mais à ${EXPORT}× le prix de référence seulement.</p>
+  <h4>4. Investir et se former</h4>
+  <p>Acheter des outils à la Forge ou des modules au Bâtisseur (${MODULES_PER_LEVEL} modules = un niveau d'atelier en plus) est un <b>investissement</b> : ce n'est pas une CI, et il ne sert qu'à partir de l'année suivante. Envoyer des travailleurs à l'École réduit leur production de moitié cette année, mais augmente votre <b>capital humain</b> durablement.</p>
+  <h4>5. Partager la valeur ajoutée</h4>
+  <p><b>VA = production vendue − CI.</b> Elle sert à payer les salaires, les impôts sur la production, et ce qui reste forme l'<b>EBE</b>. Une part de l'EBE est versée en dividendes aux villageois (revenus du capital), le reste alimente votre trésorerie.</p>
+  <h4>5 bis. La Ferme, une entreprise individuelle</h4>
+  <p>L'EBE de la Ferme n'est pas un profit d'actionnaires : c'est le <b>revenu mixte</b> de l'exploitant, qui rémunère à la fois son travail et le capital qu'il a apporté. Il en prélève une partie pour vivre, le reste reste dans l'exploitation.</p>
+  <h4>6. Les villageois</h4>
+  <p>Ils travaillent pour vous et dépensent leurs revenus (salaires + dividendes) en pain, légumes et maisons. S'ils mangent bien et ont des logements, la population augmente : plus de travailleurs l'an prochain. S'ils ont faim, ils partent.</p>
+  <h4>7. L'IDH du village</h4>
+  <p>Moyenne de trois indices : santé (alimentation), éducation (compétence moyenne des travailleurs), niveau de vie (PIB par habitant). Le PIB du village est la somme des valeurs ajoutées de toutes les équipes.</p>
+  <h4>8. Pourquoi pas la somme des chiffres d'affaires ?</h4>
+  <p>Le blé vendu par la Ferme est compté dans le CA de la Ferme, puis une deuxième fois dans le prix du pain. Additionner les CA, c'est faire un <b>double compte</b>. La projection affiche les deux totaux pour que vous voyiez l'écart.</p>`;
+}
+$('#rulesClose').onclick = () => $('#rules').classList.add('hidden');
+$('#tRulesBtn').onclick = () => { $('#rulesBody').innerHTML = rulesHTML(); $('#rules').classList.remove('hidden'); };
+
+/* ----------------------------- ACCUEIL ----------------------------- */
+function initHome() {
+  show('home');
+  $('#joinBtn').onclick = async () => {
+    const code = $('#joinCode').value.trim().toUpperCase(); if (!code) return;
+    const S = await store.getSession(code); const box = $('#joinTeams');
+    if (!S) { $('#joinMsg').textContent = 'Aucune partie avec ce code.'; box.classList.add('hidden'); return; }
+    const mem = await store.listMembers(code);
+    box.classList.remove('hidden'); $('#joinMsg').textContent = '';
+    box.innerHTML = TEAMS.map(t => `<button data-t="${t}" ${isBot(S, t) ? 'disabled' : ''}><span class="em">${isBot(S, t) ? '🤖' : ACT[t].em}</span><span>${ACT[t].name}${isBot(S, t) ? '<br><small style="opacity:.7">jouée par un robot</small>' : mem[t] ? '<br><small style="opacity:.7">déjà connectée</small>' : ''}</span></button>`).join('');
+    box.querySelectorAll('button').forEach(b => b.onclick = async () => {
+      const t = b.dataset.t; if (mem[t] && !confirm('Cette équipe est déjà connectée. La rejoindre quand même (par exemple après un rechargement) ?')) return;
+      await store.joinTeam(code, t); location.hash = `#equipe/${code}/${t}`;
+    });
+  };
+  $('#cfgHumans').innerHTML = TEAMS.map(t => `<label><input type="checkbox" value="${t}" checked> ${ACT[t].em} ${ACT[t].name.replace(/^(La|Le|L')\s?/, '')}</label>`).join('');
+  $('#createBtn').onclick = async () => {
+    const pin = $('#cfgPin').value.trim(); if (pin.length < 4) { $('#profMsg').textContent = 'Choisissez un code secret d\'au moins 4 caractères.'; return; }
+    const humans = $$('#cfgHumans input:checked').map(i => i.value); if (!humans.length) { $('#profMsg').textContent = 'Cochez au moins une activité jouée par des élèves.'; return; }
+    const mood = $('#cfgBotMood').value, bots = {}; TEAMS.forEach(t => { if (!humans.includes(t)) bots[t] = mood; });
+    const code = genCode(); const S = newState(clamp(+$('#cfgYears').value || 5, 2, 10), pin, bots);
+    await store.saveSession(code, S); localStorage.setItem('vil-prof-' + code, pin); location.hash = `#prof/${code}`;
+  };
+  $('#resumeBtn').onclick = () => { const c = $('#resumeCode').value.trim().toUpperCase(); if (c) location.hash = `#prof/${c}`; };
+}
+
+/* ----------------------------- VUE ÉQUIPE ----------------------------- */
+const TV = { code: null, team: null, S: null, dec: null, offers: [], tab: 'nego', form: {}, village: null, lastStamp: 0, renderedTab: null };
+async function initTeam(code, team) {
+  show('team'); TV.code = code; TV.team = team;
+  const a = ACT[team];
+  $('#tHead').style.background = `linear-gradient(120deg, ${a.color}, ${shade(a.color, -0.35)})`;
+  $('#tHead').innerHTML = `<span class="em">${a.em}</span><div><h2>${a.name}</h2><p>${a.role}</p></div>`;
+  $$('#tTabs button').forEach(b => b.onclick = () => { TV.tab = b.dataset.t; $$('#tTabs button').forEach(x => x.setAttribute('aria-selected', x === b)); renderTeamPane(true); });
+  TV.village = createVillage($('#miniCanvas'), { labels: false, sky1: '#2E4A5C', sky2: '#3E6B5A' });
+  store.subscribe(code, () => refreshTeam());
+  await refreshTeam();
+  setInterval(() => { if (TV.S) $('#tTimer').textContent = timerTxt(TV.S); }, 1000);
+}
+async function refreshTeam() {
+  const S = await store.getSession(TV.code); if (!S) return;
+  const phaseChanged = !TV.S || TV.S.phase !== S.phase || TV.S.year !== S.year;
+  TV.S = S;
+  TV.offers = S.year ? await store.listOffers(TV.code, S.year) : [];
+  let d = S.year ? await store.getDecision(TV.code, TV.team, S.year) : null;
+  TV.dec = Object.assign(defaultDecision(S, TV.team), d || {});
+  TV.village.setState(S);
+  if (S.animStamp && S.animStamp !== TV.lastStamp && lastRec(S)) { if (TV.lastStamp) TV.village.play(lastRec(S), 9000); TV.lastStamp = S.animStamp; if (phaseChanged && S.phase !== 'open') { TV.tab = 'res'; $$('#tTabs button').forEach(x => x.setAttribute('aria-selected', x.dataset.t === 'res')); } }
+  $('#tYear').textContent = S.year ? `Année ${S.year} / ${S.years}` : 'Préparation';
+  $('#tPhase').textContent = phaseTxt(S);
+  renderTeamStats(); renderTeamPane(phaseChanged || TV.tab !== 'dec'); renderPreview();
+}
+function renderTeamStats() {
+  const tm = TV.S.teams[TV.team];
+  const items = [['Trésorerie', fmt(tm.cash) + ' écus'], ['Travailleurs', tm.workers], ['Outils', fmt(tm.tools, 1)], ['Compétence', '× ' + fmt(tm.skill, 2)],
+                 ['Atelier', 'niveau ' + tm.level + (tm.modules ? ` (+${tm.modules} module)` : '')], ['Population du village', TV.S.P], ['Score', fmt(tm.score)], ['Stock', Object.entries(tm.out).filter(([g, q]) => q > 0).map(([g, q]) => fmt(q, 1) + ' ' + GOODS[g].em).join(' ') || '—']];
+  $('#tStats').innerHTML = items.map(([k, v]) => `<div class="stat"><small>${k}</small><b>${v}</b></div>`).join('');
+}
+function renderTeamPane(force) {
+  if (!force && TV.renderedTab === TV.tab) return;
+  TV.renderedTab = TV.tab;
+  const p = $('#tPane');
+  if (TV.tab === 'nego') p.innerHTML = negoHTML(), bindNego();
+  if (TV.tab === 'dec') p.innerHTML = decHTML(), bindDec();
+  if (TV.tab === 'res') p.innerHTML = resHTML(), bindRes();
+}
+function offerLine(o, me) {
+  const other = o.seller === me ? o.buyer : o.seller, g = GOODS[o.good], verb = o.seller === me ? 'Vente à' : 'Achat à';
+  return `<span class="em">${g.em}</span><div class="txt"><b>${verb} ${ACT[other].name}${isBot(TV.S, other) ? ' 🤖' : ''}</b><br>${fmt(o.qty, 1)} ${g.u} × ${fmt(o.price, 2)} écus = <b>${fmt(o.qty * o.price)} écus</b></div>`;
+}
+function negoHTML() {
+  const S = TV.S, me = TV.team, a = ACT[me];
+  if (S.phase !== 'open') return `<p>${S.phase === 'lobby' ? "La partie n'a pas encore commencé. Lisez les règles et préparez votre stratégie : de qui avez-vous besoin ? Qui a besoin de vous ?" : "Les négociations sont fermées. Consultez vos résultats dans l'onglet « Mes comptes »."}</p>
+    <h4 style="margin:.6rem 0 .3rem">Vos partenaires</h4>${partnersHTML()}`;
+  const f = TV.form; f.mode ||= a.sells.length ? 'sell' : 'buy';
+  const buyGoods = buysOf(me);
+  f.good = f.mode === 'sell' ? a.sells[0] : (buyGoods.includes(f.good) ? f.good : buyGoods[0]);
+  const partners = f.mode === 'sell' ? TEAMS.filter(t => t !== me && buysOf(t).includes(f.good)) : [sellerOf(f.good)];
+  if (!partners.includes(f.to)) f.to = partners[0];
+  const g = GOODS[f.good]; f.qty ??= 10; f.price ??= g.ref;
+  const mine = TV.offers.filter(o => o.seller === me || o.buyer === me);
+  const incoming = mine.filter(o => o.status === 'pending' && o.author !== me);
+  const outgoing = mine.filter(o => o.status === 'pending' && o.author === me);
+  const signed = mine.filter(o => o.status === 'accepted');
+  return `
+  <div class="card" style="background:#FFF8E6;border-color:#F0D9A0">
+    <h4 style="margin-bottom:.5rem">Proposer un échange</h4>
+    <div class="seg" style="margin-bottom:.6rem">
+      ${a.sells.length ? `<button data-mode="sell" aria-pressed="${f.mode === 'sell'}">Je vends</button>` : ''}
+      <button data-mode="buy" aria-pressed="${f.mode === 'buy'}">J'achète</button>
+    </div>
+    <div class="grid2">
+      <label class="f">Produit<select id="fGood" ${f.mode === 'sell' ? 'disabled' : ''}>${(f.mode === 'sell' ? a.sells : buyGoods).map(x => `<option value="${x}" ${x === f.good ? 'selected' : ''}>${GOODS[x].em} ${GOODS[x].n}</option>`).join('')}</select></label>
+      <label class="f">${f.mode === 'sell' ? 'Acheteur' : 'Vendeur'}<select id="fTo">${partners.map(t => `<option value="${t}" ${t === f.to ? 'selected' : ''}>${ACT[t].em} ${ACT[t].name}${isBot(TV.S, t) ? ' (robot)' : ''}</option>`).join('')}</select></label>
+      <label class="f">Quantité (${g.u})<input type="number" id="fQty" min="0" step="any" value="${f.qty}"></label>
+      <label class="f">Prix unitaire (écus)<input type="number" id="fPrice" min="0" step="any" value="${f.price}"></label>
+    </div>
+    <p class="help">Repères : prix de référence ${fmt(g.ref, 2)} · importer coûte ${fmt(g.ref * IMPORT, 2)} · exporter rapporte ${fmt(g.ref * EXPORT, 2)}. Total de l'offre : <b id="fTot">${fmt(f.qty * f.price)} écus</b></p>
+    <button class="btn gold" id="fSend" style="margin-top:.4rem">Envoyer l'offre</button>
+  </div>
+  <h4 style="margin:1rem 0 .4rem">Offres reçues ${incoming.length ? `<span class="pill tag-wait">${incoming.length}</span>` : ''}</h4>
+  ${incoming.length ? incoming.map(o => `<div class="offer in" data-id="${o.id}">${offerLine(o, me)}
+      <div style="display:flex;gap:.3rem;flex-wrap:wrap"><button class="btn sm green" data-act="acc">Accepter</button><button class="btn sm ghost" data-act="ctr">Contre-proposer</button><button class="btn sm red" data-act="ref">Refuser</button></div>
+      <div class="ctr hidden" style="width:100%;display:flex;gap:.4rem;align-items:end"><label class="f" style="flex:1">Quantité<input type="number" step="any" value="${o.qty}" class="cq"></label><label class="f" style="flex:1">Prix<input type="number" step="any" value="${o.price}" class="cp"></label><button class="btn sm gold" data-act="send">Envoyer</button></div></div>`).join('') : '<p class="help">Aucune offre en attente.</p>'}
+  <h4 style="margin:1rem 0 .4rem">Mes offres envoyées</h4>
+  ${outgoing.length ? outgoing.map(o => `<div class="offer" data-id="${o.id}">${offerLine(o, me)}<span class="pill tag-wait">en attente</span><button class="btn sm ghost" data-act="cancel">Retirer</button></div>`).join('') : '<p class="help">Aucune offre en attente de réponse.</p>'}
+  <h4 style="margin:1rem 0 .4rem">Contrats signés</h4>
+  ${signed.length ? signed.map(o => `<div class="offer acc">${offerLine(o, me)}<span class="pill tag-ok">signé</span></div>`).join('') : '<p class="help">Aucun contrat pour l\'instant.</p>'}`;
+}
+function partnersHTML() {
+  const me = TV.team, a = ACT[me];
+  const sup = buysOf(me).map(g => `${GOODS[g].em} ${GOODS[g].n} auprès de ${ACT[sellerOf(g)].name}${a.recipe[g] !== undefined ? ` (${a.recipe[g]} par ${a.unit.replace(/s$/, '')})` : ' (investissement)'}`);
+  const cli = a.sells.length ? TEAMS.filter(t => t !== me && buysOf(t).includes(a.sells[0])).map(t => ACT[t].name) : [];
+  return `<p class="help" style="font-size:.88rem"><b>Vous achetez :</b> ${sup.join(' ; ')}.<br>${cli.length ? `<b>Vos clients :</b> ${cli.join(', ')}${a.pub ? ' et les villageois' : ''}.` : a.pub ? '<b>Vos clients :</b> les villageois.' : '<b>Vos « clients » :</b> les travailleurs des autres équipes, que vous formez gratuitement.'}</p>`;
+}
+function bindNego() {
+  const f = TV.form, me = TV.team;
+  $$('#tPane [data-mode]').forEach(b => b.onclick = () => { f.mode = b.dataset.mode; f.qty = undefined; f.price = undefined; renderTeamPane(true); });
+  const upd = () => { f.qty = +$('#fQty').value; f.price = +$('#fPrice').value; $('#fTot').textContent = fmt(f.qty * f.price) + ' écus'; };
+  if ($('#fGood')) $('#fGood').onchange = e => { f.good = e.target.value; f.price = undefined; renderTeamPane(true); };
+  if ($('#fTo')) $('#fTo').onchange = e => { f.to = e.target.value; };
+  if ($('#fQty')) { $('#fQty').oninput = upd; $('#fPrice').oninput = upd; }
+  if ($('#fSend')) $('#fSend').onclick = async () => {
+    upd(); if (!(f.qty > 0) || !(f.price >= 0)) return alert('Indiquez une quantité et un prix valides.');
+    const seller = f.mode === 'sell' ? me : f.to, buyer = f.mode === 'sell' ? f.to : me;
+    await store.createOffer(TV.code, { year: TV.S.year, seller, buyer, good: f.good, qty: r1(f.qty), price: Math.round(f.price * 100) / 100, status: 'pending', author: me });
+    refreshTeam();
+  };
+  $$('#tPane .offer[data-id]').forEach(el => {
+    const id = el.dataset.id, o = TV.offers.find(x => String(x.id) === id);
+    el.querySelectorAll('[data-act]').forEach(b => b.onclick = async () => {
+      const act = b.dataset.act;
+      if (act === 'acc') { const ok = await store.updateOffer(TV.code, o.id, { status: 'accepted' }, true); if (!ok) alert("Cette offre n'est plus disponible."); }
+      if (act === 'ref') await store.updateOffer(TV.code, o.id, { status: 'refused' }, true);
+      if (act === 'cancel') await store.updateOffer(TV.code, o.id, { status: 'cancelled' }, true);
+      if (act === 'ctr') { el.querySelector('.ctr').classList.toggle('hidden'); return; }
+      if (act === 'send') {
+        const q = +el.querySelector('.cq').value, p = +el.querySelector('.cp').value; if (!(q > 0)) return;
+        const ok = await store.updateOffer(TV.code, o.id, { status: 'countered' }, true);
+        if (ok) await store.createOffer(TV.code, { year: TV.S.year, seller: o.seller, buyer: o.buyer, good: o.good, qty: r1(q), price: Math.round(p * 100) / 100, status: 'pending', author: me });
+      }
+      refreshTeam();
+    });
+  });
+}
+function decHTML() {
+  const S = TV.S, d = TV.dec, a = ACT[TV.team], dis = S.phase !== 'open' ? 'disabled' : '';
+  const isSchool = TV.team === 'ecole';
+  return `
+  ${S.phase !== 'open' ? '<div class="alert">Les décisions ne sont modifiables que pendant une année ouverte.</div>' : d.submitted ? '<div class="okbox">Décisions validées. Vous pouvez encore les modifier jusqu\'à la clôture de l\'année.</div>' : ''}
+  <h4 style="margin-bottom:.4rem">Le facteur travail</h4>
+  <div class="grid2">
+    <label class="f">${isSchool ? 'Enseignants' : 'Travailleurs souhaités'}<input type="number" id="dW" min="1" value="${d.workers}" ${dis}></label>
+    <label class="f">Salaire annuel par personne (écus)<input type="number" id="dWage" min="${WAGE_MIN}" value="${d.wage}" ${dis}></label>
+  </div>
+  <p class="help">Population active du village : ${Math.floor(0.75 * S.P)} personnes. Si les équipes en demandent plus, chacune en obtient moins. Salaire minimum : ${WAGE_MIN} écus.</p>
+  ${isSchool ? '' : `<label class="f" style="margin-top:.5rem">Travailleurs envoyés en formation à l'École<input type="number" id="dTrain" min="0" value="${d.train}" ${dis}></label>
+  <p class="help">Ils produisent moitié moins cette année, mais votre compétence augmente pour les années suivantes.</p>`}
+  <h4 style="margin:.9rem 0 .4rem">La production</h4>
+  <div class="grid2">
+    <label class="f">Production visée (0 = le maximum possible)<input type="number" id="dTarget" min="0" value="${d.target}" ${dis}></label>
+    ${TV.team === 'ferme' ? `<label class="f">Part de la récolte en blé (%)<input type="number" id="dBle" min="0" max="100" value="${d.blePct}" ${dis}></label>` : '<span></span>'}
+    ${a.pub ? `<label class="f">Prix de vente aux villageois (${GOODS[a.pub].em} ${GOODS[a.pub].n})<input type="number" id="dPub" min="0" step="any" value="${d.pubPrice}" ${dis}></label>` : ''}
+    ${a.nonMarchand ? '' : `<label class="f">${a.ei ? "Part du revenu mixte prélevée par l'exploitant (%)" : "Part de l'EBE versée en dividendes (%)"}<input type="number" id="dDiv" min="0" max="100" value="${d.div}" ${dis}></label>`}
+  </div>
+  <div style="margin-top:.7rem;display:grid;gap:.3rem">
+    <label style="display:flex;gap:.5rem;align-items:center;font-weight:700"><input type="checkbox" id="dImp" ${d.autoImport ? 'checked' : ''} ${dis}> Importer automatiquement les intrants manquants (${IMPORT}× le prix de référence)</label>
+    ${a.nonMarchand ? '' : `<label style="display:flex;gap:.5rem;align-items:center;font-weight:700"><input type="checkbox" id="dExp" ${d.autoExport ? 'checked' : ''} ${dis}> Exporter automatiquement les invendus (${EXPORT}× le prix de référence)</label>`}
+  </div>
+  <div style="margin-top:1rem;display:flex;gap:.5rem;align-items:center">
+    <button class="btn ${d.submitted ? 'ghost' : 'green'}" id="dSubmit" ${dis}>${d.submitted ? 'Modifier mes décisions' : 'Valider mes décisions'}</button>
+    <span class="help" id="dSaved"></span>
+  </div>`;
+}
+const saveDec = debounce(async () => { await store.saveDecision(TV.code, TV.team, TV.S.year, TV.dec); const el = $('#dSaved'); if (el) el.textContent = 'Enregistré'; }, 500);
+function bindDec() {
+  const d = TV.dec; const map = { dW: 'workers', dWage: 'wage', dTrain: 'train', dTarget: 'target', dBle: 'blePct', dPub: 'pubPrice', dDiv: 'div' };
+  Object.entries(map).forEach(([id, k]) => { const el = $('#' + id); if (el) el.oninput = () => { d[k] = +el.value; d.submitted = false; saveDec(); renderPreview(); $('#dSubmit').textContent = 'Valider mes décisions'; $('#dSubmit').className = 'btn green'; }; });
+  if ($('#dImp')) $('#dImp').onchange = e => { d.autoImport = e.target.checked; saveDec(); renderPreview(); };
+  if ($('#dExp')) $('#dExp').onchange = e => { d.autoExport = e.target.checked; saveDec(); renderPreview(); };
+  if ($('#dSubmit')) $('#dSubmit').onclick = async () => { d.submitted = !d.submitted; await store.saveDecision(TV.code, TV.team, TV.S.year, d); renderTeamPane(true); };
+}
+function renderPreview() {
+  const S = TV.S, t = TV.team, a = ACT[t];
+  if (!S.year || S.phase !== 'open') {
+    const R = lastRec(S);
+    $('#tPreview').innerHTML = R ? `<h3>Le village après l'année ${R.year}</h3>${villageSummary(R)}` : `<h3>Votre fonction de production</h3><p style="margin:0;font-size:.92rem">Chaque travailleur produit ${a.b} ${a.unit}, chaque outil utilisé ${a.m} de plus. Atelier niveau 1 : ${a.cap} ${a.unit} maximum.</p>${partnersHTML().replace(/class="help"/, 'style="color:#D5DCEA;font-size:.9rem"')}`;
+    return;
+  }
+  const E = estimate(S, t, TV.dec, TV.offers);
+  const inputs = Object.entries(E.inputs).map(([g, v]) => `<tr><td>${GOODS[g].em} ${GOODS[g].n}</td><td class="n">${fmt(v.need, 1)}</td><td class="n">${fmt(v.fromStock + v.fromContracts, 1)}</td><td class="n" style="color:${v.imp > 0 ? '#F2B8A8' : 'inherit'}">${v.imp > 0 ? fmt(v.imp, 1) : '—'}</td></tr>`).join('');
+  const alerts = [];
+  if (E.limit === 'intrants') alerts.push(`Production freinée par le manque d'intrants : sécurisez vos achats ou activez l'importation.`);
+  if (E.limit === 'atelier') alerts.push(`Votre atelier est saturé (${fmt(E.cap)} ${a.unit}) : un agrandissement vous permettrait de produire plus.`);
+  if (S.teams[t].tools > TOOLS_PER_WORKER * E.workers) alerts.push(`Certains outils restent inutilisés : pas assez de travailleurs pour les manier (complémentarité).`);
+  if (E.trainees > 0 && TV.dec.train > 0) alerts.push(`${E.trainees} travailleur(s) en formation produisent moitié moins cette année.`);
+  if (S.teams[t].cash < 0) alerts.push(`Trésorerie négative : des intérêts de 8 % vous seront facturés.`);
+  $('#tPreview').innerHTML = `
+    <h3>Estimation de votre année ${S.year}</h3>
+    <p style="margin:0 0 .5rem;font-size:.9rem;color:#D5DCEA">(${E.workers} trav. × ${a.b} + ${fmt(E.effT, 1)} outils × ${a.m}) × ${fmt(S.teams[t].skill, 2)} = <b style="color:#fff">${fmt(E.potential, 1)}</b> ${a.unit} possibles · atelier : ${fmt(E.cap)} max</p>
+    ${inputs ? `<table class="t"><thead><tr><th>Intrant</th><th class="n">Besoin</th><th class="n">Assuré</th><th class="n">Import</th></tr></thead><tbody>${inputs}</tbody></table>` : ''}
+    <table class="t" style="margin-top:.6rem"><tbody>
+      <tr><td>Production estimée</td><td class="n"><b>${fmt(E.out, 1)} ${a.unit}</b></td></tr>
+      ${a.nonMarchand ? `<tr><td>Budget reçu (impôts)</td><td class="n">${fmt(S.schoolBudget)} écus</td></tr>` : `<tr><td>Chiffre d'affaires estimé</td><td class="n">${fmt(E.ca)}</td></tr>`}
+      <tr><td>− Consommations intermédiaires</td><td class="n">${fmt(E.ci)}</td></tr>
+      <tr class="tot"><td>${a.nonMarchand ? 'Valeur ajoutée (non marchande)' : '= Valeur ajoutée'}</td><td class="n">${fmt(E.va)}</td></tr>
+      <tr><td>− Rémunération des salariés</td><td class="n">${fmt(E.rem)}</td></tr>
+      ${a.nonMarchand ? '' : `<tr><td>− Impôts sur la production</td><td class="n">${fmt(E.imp)}</td></tr><tr class="tot"><td>= EBE${a.ei ? ' (revenu mixte)' : ''}</td><td class="n">${fmt(E.ebe)}</td></tr><tr><td>Taux de marge</td><td class="n">${pct(E.marge)}</td></tr>`}
+      <tr><td>Productivité par tête</td><td class="n">${fmt(E.prodPerHead, 1)} ${a.unit}</td></tr>
+      ${E.invest ? `<tr><td>Investissement (outils, modules)</td><td class="n">${fmt(E.invest)}</td></tr>` : ''}
+    </tbody></table>
+    ${alerts.map(x => `<div class="alert" style="background:#3A2730;border-color:#7A3A3A;color:#F6CFC6">${x}</div>`).join('')}
+    <p style="margin:.5rem 0 0;font-size:.78rem;color:#AFC0DA">Estimation fondée sur vos contrats signés. Le résultat réel dépend de ce que vos fournisseurs livreront vraiment et des achats des villageois.</p>`;
+}
+function villageSummary(R) {
+  const V = R.village;
+  return `<table class="t"><tbody>
+    <tr><td>PIB du village (Σ des VA)</td><td class="n"><b>${fmt(V.PIB)} écus</b></td></tr>
+    ${V.sumCA != null ? `<tr><td>Σ des chiffres d'affaires (double compte)</td><td class="n">${fmt(V.sumCA)} écus</td></tr>` : ''}
+    <tr><td>PIB par habitant</td><td class="n">${fmt(V.pibHab, 1)}</td></tr>
+    <tr><td>IDH du village</td><td class="n"><b>${fmt(V.IDH, 3)}</b></td></tr>
+    <tr><td>Population</td><td class="n">${V.P0} → ${V.P} (${V.dP >= 0 ? '+' : ''}${V.dP})</td></tr>
+    <tr><td>Villageois nourris</td><td class="n">${pct(V.foodSat)}</td></tr>
+    <tr><td>Partage de la VA : salaires / impôts / EBE des sociétés / revenu mixte</td><td class="n">${pct(V.sRem / V.PIB)} / ${pct(V.sImp / V.PIB)} / ${pct(V.sEbe / V.PIB)} / ${pct((V.sMixte || 0) / V.PIB)}</td></tr>
+    ${V.hh ? `<tr><td>Revenu disponible des villageois</td><td class="n">${fmt(V.hh.dispo)} écus</td></tr>` : ''}
+  </tbody></table>`;
+}
+function accountTable(R, t) {
+  const a = ACT[t];
+  if (a.nonMarchand) return `<table class="t"><tbody>
+    <tr><td>Places de formation produites</td><td class="n">${fmt(R.output, 1)}</td></tr><tr><td>Places utilisées</td><td class="n">${fmt(R.placesUsed, 1)}</td></tr>
+    <tr><td>Budget reçu (impôts)</td><td class="n">${fmt(R.subvention)}</td></tr>
+    <tr><td>Production non marchande (évaluée au coût)</td><td class="n">${fmt(R.prod)}</td></tr><tr><td>− Consommations intermédiaires</td><td class="n">${fmt(R.ci)}</td></tr>
+    <tr class="tot"><td>= Valeur ajoutée</td><td class="n">${fmt(R.va)}</td></tr><tr><td>Rémunération des enseignants</td><td class="n">${fmt(R.rem)}</td></tr>
+    <tr><td>Trésorerie en fin d'année</td><td class="n sens">${fmt(R.cash)}</td></tr></tbody></table>`;
+  return `<table class="t"><tbody>
+    <tr><td>Ventes aux équipes (contrats)</td><td class="n">${fmt(R.caContracts)}</td></tr>
+    ${a.pub ? `<tr><td>Ventes aux villageois</td><td class="n">${fmt(R.caPublic)}</td></tr>` : ''}
+    <tr><td>Exportations</td><td class="n">${fmt(R.caExport)}</td></tr>
+    <tr class="tot"><td>Production vendue (CA)</td><td class="n">${fmt(R.ca)}</td></tr>
+    <tr><td>− Consommations intermédiaires${R.imports ? ` (dont imports ${fmt(R.imports)})` : ''}</td><td class="n">${fmt(R.ci)}</td></tr>
+    <tr class="tot"><td>= Valeur ajoutée</td><td class="n">${fmt(R.va)}</td></tr>
+    <tr><td>− Rémunération des salariés</td><td class="n">${fmt(R.rem)}</td></tr>
+    <tr><td>− Impôts sur la production</td><td class="n">${fmt(R.imp)}</td></tr>
+    <tr class="tot"><td>= Excédent brut d'exploitation${a.ei ? " : revenu mixte de l'exploitant" : ''}</td><td class="n">${fmt(R.ebe)}</td></tr>
+    ${a.ei ? `<tr><td>Prélevé par l'exploitant pour vivre</td><td class="n">${fmt(R.div)}</td></tr><tr><td>Laissé dans l'exploitation</td><td class="n">${fmt(Math.max(0, R.ebe) - R.div)}</td></tr>` : `<tr><td>Dividendes versés aux villageois</td><td class="n">${fmt(R.div)}</td></tr>`}
+    ${R.interest ? `<tr><td>Intérêts sur découvert</td><td class="n">${fmt(R.interest)}</td></tr>` : ''}
+    <tr><td>Investissement (outils, modules)</td><td class="n">${fmt(R.invest)}</td></tr>
+    <tr><td>Trésorerie en fin d'année</td><td class="n sens">${fmt(R.cash)}</td></tr></tbody></table>`;
+}
+function indicTable(R, t) {
+  const a = ACT[t];
+  return `<table class="t"><tbody>
+    <tr><td>Production</td><td class="n">${fmt(R.output, 1)} ${a.unit} (possible : ${fmt(Math.min(R.potential, R.cap), 1)})</td></tr>
+    <tr><td>Travailleurs</td><td class="n">${R.workers}${R.trainees ? ` dont ${R.trainees} en formation` : ''}</td></tr>
+    <tr><td>Productivité par tête</td><td class="n">${fmt(R.prodPerHead, 2)}</td></tr>
+    <tr><td>Gain de productivité</td><td class="n">${R.gain == null ? '— (1re année)' : (R.gain >= 0 ? '+' : '') + pct(R.gain, 1)}</td></tr>
+    ${a.nonMarchand ? '' : `<tr><td>Taux de marge (EBE ÷ VA)</td><td class="n">${pct(R.marge, 1)}</td></tr><tr><td>Part des salaires dans la VA</td><td class="n">${R.va > 0 ? pct(R.rem / R.va, 1) : '—'}</td></tr>`}
+    ${R.lost ? `<tr><td>Production perdue (invendus périssables)</td><td class="n">${fmt(R.lost, 1)}</td></tr>` : ''}
+    <tr><td>Points cette année / total</td><td class="n"><b>${R.points}</b> / ${R.score}</td></tr></tbody></table>`;
+}
+function resHTML() {
+  const S = TV.S, t = TV.team; if (!S.history.length) return '<p>Vos comptes apparaîtront ici après la première année.</p>';
+  const R = lastRec(S), T = R.teams[t];
+  const rows = S.history.map(h => { const x = h.teams[t]; return `<tr><td>${h.year}</td><td class="n">${fmt(x.output, 1)}</td><td class="n">${fmt(x.va)}</td><td class="n">${fmt(x.ebe)}</td><td class="n">${pct(x.marge)}</td><td class="n">${fmt(x.prodPerHead, 1)}</td><td class="n">${x.gain == null ? '—' : pct(x.gain, 1)}</td><td class="n">${x.points}</td></tr>`; }).join('');
+  return `<h4 style="margin-bottom:.4rem">Année ${R.year}${R.events.length ? ' · ' + R.events.map(e => EVENTS[e].em + ' ' + EVENTS[e].n).join(', ') : ''}</h4>
+    <div class="grid2" style="align-items:start"><div>${accountTable(T, t)}</div><div>${indicTable(T, t)}</div></div>
+    <h4 style="margin:1rem 0 .4rem">Évolution</h4>
+    <div style="overflow-x:auto"><table class="t"><thead><tr><th>Année</th><th class="n">Prod.</th><th class="n">VA</th><th class="n">EBE</th><th class="n">Marge</th><th class="n">Prod./tête</th><th class="n">Gain</th><th class="n">Points</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function bindRes() {}
+
+/* ----------------------------- CONSOLE PROF ----------------------------- */
+const PV = { code: null, S: null, offers: [], decisions: {}, members: {} };
+async function initProf(code) {
+  const S0 = await store.getSession(code);
+  if (!S0) { alert('Partie introuvable.'); location.hash = ''; return; }
+  if (localStorage.getItem('vil-prof-' + code) !== S0.pin) {
+    const p = prompt('Code secret de la partie :'); if (p !== S0.pin) { alert('Code incorrect.'); location.hash = ''; return; }
+    localStorage.setItem('vil-prof-' + code, p);
+  }
+  show('prof'); PV.code = code; $('#pCode').textContent = code;
+  $('#openProj').onclick = () => window.open(location.pathname + '#projection/' + code, '_blank');
+  $$('#pView button').forEach(b => b.onclick = () => setView({ mode: b.dataset.v }));
+  $('#pViewTeam').innerHTML = TEAMS.map(t => `<button data-t="${t}" aria-pressed="false">${ACT[t].em} ${ACT[t].name.replace(/^(La|Le|L')\s?/, '')}</button>`).join('');
+  $$('#pViewTeam button').forEach(b => b.onclick = () => setView({ team: b.dataset.t, mode: ['village', 'compare', 'villageois', 'end'].includes(PV.S.view.mode) ? 'equipe' : PV.S.view.mode }));
+  $('#pBlur').onchange = e => setView({ blur: e.target.checked });
+  $('#pEvents').innerHTML = Object.entries(EVENTS).map(([k, e]) => `<button data-e="${k}" aria-pressed="false" title="${e.d}">${e.em} ${e.n}</button>`).join('');
+  $$('#pEvents button').forEach(b => b.onclick = async () => {
+    if (PV.S.phase !== 'open') return alert("Les événements se programment pendant une année ouverte.");
+    const S = await fresh(); const k = b.dataset.e; S.events = S.events.includes(k) ? S.events.filter(x => x !== k) : [...S.events, k]; await saveS(S);
+  });
+  [['pTaxInc', 'taxInc'], ['pTaxProd', 'taxProd'], ['pDur', 'dur']].forEach(([id, k]) => $('#' + id).onchange = async e => { const S = await fresh(); S[k] = clamp(+e.target.value || 0, 0, 60); await saveS(S); });
+  store.subscribe(code, () => refreshProf());
+  await refreshProf();
+  setInterval(() => { if (PV.S) $('#pTimer').textContent = timerTxt(PV.S); }, 1000);
+  setInterval(botTick, 3000);
+}
+const fresh = async () => await store.getSession(PV.code);
+async function saveS(S) { await store.saveSession(PV.code, S); PV.S = S; renderProf(); }
+async function setView(patch) { const S = await fresh(); S.view = Object.assign({}, S.view, patch); await saveS(S); }
+let botBusy = false;
+async function botTick(force) {
+  const S = PV.S; if (botBusy || !S || S.phase !== 'open' || !S.bots || !Object.keys(S.bots).length) return;
+  botBusy = true;
+  try {
+    const dec = await store.listDecisions(PV.code, S.year);
+    for (const t of TEAMS) if (isBot(S, t) && !(dec[t] && dec[t].bot)) { dec[t] = botDecision(S, t); await store.saveDecision(PV.code, t, S.year, dec[t]); }
+    let offers = await store.listOffers(PV.code, S.year);
+    const acts = botActions(S, offers, dec, force ? Infinity : Date.now());
+    for (const a of acts) {
+      if (a.kind === 'update') await store.updateOffer(PV.code, a.id, a.patch, true);
+      else await store.createOffer(PV.code, a.offer);
+    }
+  } catch (e) { console.error(e); }
+  botBusy = false;
+}
+async function refreshProf() {
+  PV.S = await fresh(); PV.members = await store.listMembers(PV.code);
+  PV.offers = PV.S.year ? await store.listOffers(PV.code, PV.S.year) : [];
+  PV.decisions = PV.S.year ? await store.listDecisions(PV.code, PV.S.year) : {};
+  renderProf();
+}
+function renderProf() {
+  const S = PV.S; const R = lastRec(S);
+  $('#pYear').textContent = S.year ? `Année ${S.year} / ${S.years}` : 'Préparation';
+  $('#pPhase').textContent = phaseTxt(S);
+  $('#pTaxInc').value = S.taxInc; $('#pTaxProd').value = S.taxProd; $('#pDur').value = S.dur;
+  $$('#pView button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === S.view.mode));
+  $$('#pViewTeam button').forEach(b => b.setAttribute('aria-pressed', b.dataset.t === S.view.team));
+  $('#pBlur').checked = !!S.view.blur;
+  $$('#pEvents button').forEach(b => b.setAttribute('aria-pressed', S.events.includes(b.dataset.e)));
+  const nSub = TEAMS.filter(t => (PV.decisions[t] && PV.decisions[t].submitted)).length;
+  const flow = [];
+  if (S.phase === 'lobby') flow.push(`<button class="btn green" id="fLaunch">Lancer l'année 1</button>`);
+  if (S.phase === 'open') flow.push(`<span class="pill ${nSub === 6 ? 'tag-ok' : 'tag-wait'}">${nSub} / 6 équipes ont validé</span><button class="btn red" id="fClose">Clôturer l'année ${S.year}</button>`);
+  if (S.phase === 'results') flow.push(`<button class="btn ghost" id="fReplay">Rejouer l'animation</button><button class="btn green" id="fLaunch">Lancer l'année ${S.year + 1}</button>`);
+  if (S.phase === 'end') flow.push(`<button class="btn ghost" id="fReplay">Rejouer l'animation</button><button class="btn gold" id="fEnd">Afficher le bilan final</button>`);
+  $('#pFlow').innerHTML = flow.join('');
+  if ($('#fLaunch')) $('#fLaunch').onclick = async () => { const S = await fresh(); S.year++; S.phase = 'open'; S.events = []; S.deadline = S.dur > 0 ? Date.now() + S.dur * 60000 : null; if (S.view.mode === 'end') S.view.mode = 'village'; await saveS(S); refreshProf(); };
+  if ($('#fClose')) $('#fClose').onclick = async () => {
+    if (nSub < 6 && !confirm(`${6 - nSub} équipe(s) n'ont pas validé. Leurs décisions actuelles (ou celles de l'an dernier) seront utilisées. Clôturer quand même ?`)) return;
+    await botTick(true); await botTick(true);
+    const S = await fresh(); const dec = await store.listDecisions(PV.code, S.year); const off = await store.listOffers(PV.code, S.year);
+    const N = computeYear(S, dec, off); if (N.phase === 'end') N.view.mode = 'village'; await saveS(N); refreshProf();
+  };
+  if ($('#fReplay')) $('#fReplay').onclick = async () => { const S = await fresh(); S.animStamp = Date.now(); await saveS(S); };
+  if ($('#fEnd')) $('#fEnd').onclick = () => setView({ mode: 'end' });
+  $('#pTeams').innerHTML = TEAMS.map(t => {
+    const tm = S.teams[t], d = PV.decisions[t], x = R && R.teams[t];
+    const st = isBot(S, t) ? `<span class="pill" style="background:#E7E9F3">🤖 ${S.bots[t] === 'dur' ? 'dur en affaires' : 'coopératif'}</span>` : !PV.members[t] ? '<span class="pill tag-ko">non connectée</span>' : S.phase !== 'open' ? '<span class="pill tag-ok">connectée</span>' : d && d.submitted ? '<span class="pill tag-ok">validé</span>' : d ? '<span class="pill tag-wait">en cours</span>' : '<span class="pill tag-wait">aucune décision</span>';
+    return `<div class="tcard" style="border-left-color:${ACT[t].color}"><h4><span>${ACT[t].em} ${ACT[t].name}</span>${st}</h4>
+      <p>Trésorerie ${fmt(tm.cash)} · ${tm.workers} trav. · ${fmt(tm.tools, 1)} outils · atelier ${tm.level} · compétence ×${fmt(tm.skill, 2)}</p>
+      ${x ? `<p>Dernière année : VA ${fmt(x.va)} · marge ${pct(x.marge)} · ${x.points} pts (total ${tm.score})</p>` : ''}
+      <div style="display:flex;gap:.3rem;margin-top:.35rem;flex-wrap:wrap">${isBot(S, t)
+        ? `<button class="btn sm ghost" data-bot="${t}" data-to="human">👥 Rendre aux élèves</button><button class="btn sm ghost" data-bot="${t}" data-to="${S.bots[t] === 'dur' ? 'coop' : 'dur'}">Passer en ${S.bots[t] === 'dur' ? 'coopératif' : 'dur'}</button>`
+        : `<button class="btn sm ghost" data-bot="${t}" data-to="coop">🤖 Confier à un robot</button>`}</div></div>`;
+  }).join('');
+  $$('#pTeams [data-bot]').forEach(b => b.onclick = async () => {
+    const S = await fresh(); S.bots ||= {}; const t = b.dataset.bot, to = b.dataset.to;
+    if (to === 'human') delete S.bots[t]; else S.bots[t] = to;
+    await saveS(S); refreshProf();
+  });
+  const lbl = { pending: ['en attente', 'tag-wait'], accepted: ['signé', 'tag-ok'], refused: ['refusé', 'tag-ko'], countered: ['contre-proposé', ''], cancelled: ['retiré', ''] };
+  $('#pOffers').innerHTML = PV.offers.length ? PV.offers.slice().reverse().map(o => `<div>${GOODS[o.good].em} <b>${ACT[o.seller].name}</b> → <b>${ACT[o.buyer].name}</b> : ${fmt(o.qty, 1)} × ${fmt(o.price, 2)} = ${fmt(o.qty * o.price)} écus <span class="pill ${lbl[o.status][1]}">${lbl[o.status][0]}</span> <small style="color:var(--muted)">proposé par ${ACT[o.author].name}</small></div>`).join('') : '<p class="help">Aucune offre pour l\'instant.</p>';
+  $('#pVillage').innerHTML = R ? villageSummary(R) + `<p class="help" style="margin-top:.5rem">Budget de l'École l'an prochain : ${fmt(S.schoolBudget)} écus · importations ${fmt(R.village.imports)} · exportations ${fmt(R.village.exportsV)} · investissement ${fmt(R.village.invest)}${R.village.laborShort ? ' · <b>pénurie de main-d\'œuvre</b>' : ''}</p>` : `<p class="help">Population ${S.P} · ${S.H} maisons · budget de l'École ${fmt(S.schoolBudget)} écus.</p>`;
+}
+
+/* ----------------------------- PROJECTION ----------------------------- */
+const JV = { code: null, S: null, village: null, lastStamp: 0, tourIdx: 0, tourTimer: null, playing: false };
+async function initProj(code) {
+  show('proj'); JV.code = code;
+  JV.village = createVillage($('#bigCanvas'), { padTop: 80, padBottom: 135, focusOffset: Math.min(240, window.innerWidth * 0.18),
+    onAnimEnd: () => { JV.playing = false; $('#season').classList.add('hidden'); renderProj(); },
+    onSeason: t => { const el = $('#season'); if (t == null) return; el.classList.remove('hidden'); el.textContent = ['🌱 Printemps', '☀️ Été', '🍂 Automne', '❄️ Hiver'][Math.min(3, Math.floor(t * 4))]; } });
+  store.subscribe(code, () => refreshProj());
+  await refreshProj();
+  setInterval(() => { if (JV.S && JV.S.phase === 'open') { const k = $('#hudTimer'); if (k) k.textContent = timerTxt(JV.S) || 'ouvert'; } }, 1000);
+}
+async function refreshProj() {
+  const S = await store.getSession(JV.code); if (!S) return; JV.S = S;
+  JV.village.setState(S);
+  if (S.animStamp && S.animStamp !== JV.lastStamp && lastRec(S)) {
+    const first = !JV.lastStamp; JV.lastStamp = S.animStamp;
+    if (!first || Date.now() - S.animStamp < 20000) { JV.playing = true; JV.village.setFocus(null); JV.village.play(lastRec(S)); tick(lastRec(S)); }
+  }
+  renderProj();
+}
+function tick(R) {
+  const el = $('#ticker'); const msgs = R.events.map(e => `${EVENTS[e].em} ${EVENTS[e].n} : ${EVENTS[e].d}`);
+  if (!msgs.length) msgs.push(`Année ${R.year} : les échanges commencent…`);
+  el.textContent = msgs.join('   ·   '); el.classList.remove('hidden'); el.style.opacity = 1;
+  setTimeout(() => { el.style.opacity = 0; setTimeout(() => el.classList.add('hidden'), 500); }, 7000);
+}
+function renderProj() {
+  const S = JV.S, R = lastRec(S), V = R && R.village, view = S.view || { mode: 'village' };
+  $('#proj').classList.toggle('blur', !!view.blur);
+  const idh = V ? V.IDH : null;
+  $('#hud').innerHTML = `<span class="brand">Le <span>Village</span></span>
+    <span class="k"><small>Année</small><b>${S.year || '—'} / ${S.years}</b></span>
+    <span class="k"><small>${S.phase === 'open' ? 'Temps restant' : 'Phase'}</small><b id="hudTimer" style="font-size:1rem">${S.phase === 'open' ? (timerTxt(S) || 'ouvert') : phaseTxt(S)}</b></span>
+    <span class="k"><small>Habitants</small><b>👥 ${S.P}</b></span><span class="k"><small>Maisons</small><b>🏠 ${S.H}</b></span>
+    <span class="k"><small>PIB du village (Σ VA)</small><b>${V ? fmt(V.PIB) : '—'}</b></span>
+    <span class="k dc"><small>Σ des CA (double compte)</small><b>${V && V.sumCA != null ? fmt(V.sumCA) : '—'}</b></span><span class="k"><small>PIB / habitant</small><b>${V ? fmt(V.pibHab, 1) : '—'}</b></span>
+    <span class="k"><small>IDH du village</small><b>${idh != null ? fmt(idh, 3) : '—'}</b><div class="gauge"><i style="width:${idh != null ? idh * 100 : 0}%"></i></div></span>`;
+  const mode = JV.playing ? 'village' : (S.phase === 'end' && view.mode === 'end' ? 'end' : view.mode);
+  $('#side').classList.toggle('hidden', !(mode === 'equipe' || mode === 'tour'));
+  $('#compare').classList.toggle('hidden', mode !== 'compare');
+  $('#villageois').classList.toggle('hidden', mode !== 'villageois');
+  $('#endscreen').classList.toggle('hidden', mode !== 'end');
+  $('#dock').classList.toggle('hidden', mode === 'compare' || mode === 'end' || mode === 'villageois');
+  clearInterval(JV.tourTimer); JV.tourTimer = null;
+  if (mode === 'village') JV.village.setFocus(null);
+  if (mode === 'equipe') { JV.village.setFocus(view.team); sideTeam(view.team); }
+  if (mode === 'tour') { const go = () => { const t = TEAMS[JV.tourIdx % 6]; JV.village.setFocus(t); sideTeam(t); JV.tourIdx++; }; go(); JV.tourTimer = setInterval(go, 12000); }
+  if (mode === 'compare') renderCompare();
+  if (mode === 'villageois') renderVillageois();
+  if (mode === 'end') renderEnd();
+  $('#dock').innerHTML = TEAMS.map(t => { const x = R && R.teams[t], tm = S.teams[t];
+    return `<div class="dcard" style="border-top-color:${ACT[t].color}"><h4>${ACT[t].em} ${ACT[t].name}${isBot(S, t) ? ' 🤖' : ''}</h4>
+      <div class="r"><span>Valeur ajoutée</span><b>${x ? fmt(x.va) : '—'}</b></div>
+      <div class="r"><span>${t === 'ecole' ? 'Places utilisées' : 'Taux de marge'}</span><b>${x ? (t === 'ecole' ? fmt(x.placesUsed, 1) : pct(x.marge)) : '—'}</b></div>
+      <div class="r"><span>Productivité / tête</span><b>${x ? fmt(x.prodPerHead, 1) : '—'}</b></div>
+      <div class="r"><span>Trésorerie</span><b class="sens">${fmt(tm.cash)}</b></div>
+      <div class="r"><span>Score</span><b>${fmt(tm.score)}</b></div></div>`; }).join('');
+}
+function sideTeam(t) {
+  const S = JV.S, R = lastRec(S);
+  $('#side').innerHTML = `<h3 style="color:${ACT[t].color}">${ACT[t].em} ${ACT[t].name}</h3>` + (R ? `<p style="margin:0 0 .6rem;color:var(--muted)">Année ${R.year}</p>${accountTable(R.teams[t], t)}<div style="height:.8rem"></div>${indicTable(R.teams[t], t)}` : `<p>${ACT[t].role}</p>`);
+}
+function svgBars(items, opt = {}) {
+  const W = 520, H = 230, L = 46, B = 34, max = Math.max(1, ...items.map(i => Math.abs(i.v))) * 1.15, bw = (W - L - 10) / items.length;
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">`;
+  for (let k = 0; k <= 4; k++) { const y = H - B - (H - B - 10) * k / 4; s += `<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="#E6DFCC"/><text x="${L - 6}" y="${y + 4}" text-anchor="end" font-size="11" fill="#667085">${fmt(max * k / 4, max < 10 ? 1 : 0)}</text>`; }
+  items.forEach((it, i) => { const h = (H - B - 10) * Math.max(0, it.v) / max, x = L + i * bw + bw * .15; s += `<rect x="${x}" y="${H - B - h}" width="${bw * .7}" height="${h}" rx="5" fill="${it.c}"/><text x="${x + bw * .35}" y="${H - B - h - 5}" text-anchor="middle" font-size="12" font-weight="700" fill="#1E2433">${fmt(it.v)}</text><text x="${x + bw * .35}" y="${H - 12}" text-anchor="middle" font-size="18">${it.l}</text>`; });
+  return s + '</svg>';
+}
+function svgLines(series, years, opt = {}) {
+  const W = 520, H = 230, L = 46, B = 30; const all = series.flatMap(s => s.v); const max = Math.max(...all) * 1.1 || 1, min = opt.zero ? 0 : Math.min(...all) * 0.9;
+  const fx = i => L + (W - L - 20) * (years.length === 1 ? .5 : i / (years.length - 1)), fy = v => H - B - (H - B - 10) * (v - min) / (max - min || 1);
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">`;
+  for (let k = 0; k <= 4; k++) { const v = min + (max - min) * k / 4, y = fy(v); s += `<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="#E6DFCC"/><text x="${L - 6}" y="${y + 4}" text-anchor="end" font-size="11" fill="#667085">${fmt(v, opt.d || 0)}</text>`; }
+  years.forEach((y, i) => s += `<text x="${fx(i)}" y="${H - 8}" text-anchor="middle" font-size="12" fill="#667085">An ${y}</text>`);
+  series.forEach(se => { s += `<polyline fill="none" stroke="${se.c}" stroke-width="3" points="${se.v.map((v, i) => fx(i) + ',' + fy(v)).join(' ')}"/>` + se.v.map((v, i) => `<circle cx="${fx(i)}" cy="${fy(v)}" r="4" fill="#fff" stroke="${se.c}" stroke-width="2"/>`).join(''); });
+  return s + '</svg>' + `<div style="display:flex;gap:1rem;font-size:.85rem;font-weight:700">${series.map(se => `<span style="color:${se.c}">● ${se.n}</span>`).join('')}</div>`;
+}
+function renderCompare() {
+  const S = JV.S, R = lastRec(S); if (!R) { $('#compare').innerHTML = '<p>Les comparaisons apparaîtront après la première année.</p>'; return; }
+  const years = S.history.map(h => h.year);
+  const part = S.history.map(h => { const V = h.village; return `<tr><td>An ${h.year}</td><td class="n">${fmt(V.PIB)}</td><td class="n">${pct(V.sRem / V.PIB)}</td><td class="n">${pct(V.sImp / V.PIB)}</td><td class="n">${pct(V.sEbe / V.PIB)}</td><td class="n">${pct((V.sMixte || 0) / V.PIB)}</td></tr>`; }).join('');
+  $('#compare').innerHTML = `
+    <div><h3>Valeur ajoutée par équipe · année ${R.year}</h3>${svgBars(TEAMS.map(t => ({ v: R.teams[t].va, c: ACT[t].color, l: ACT[t].em })))}</div>
+    <div><h3>PIB et somme des chiffres d'affaires</h3>${svgGroups(S.history.map(h => ({ y: h.year, v: [h.village.PIB, h.village.sumCA || 0] })), [['PIB = Σ des VA', '#3C6FB6'], ['Σ des CA (double compte)', '#E2A93B']])}
+      <p class="help">L'écart correspond aux consommations intermédiaires : les mêmes biens sont comptés plusieurs fois quand on additionne les chiffres d'affaires.</p></div>
+    <div><h3>Partage de la valeur ajoutée du village</h3>${svgStacked(S.history.map(h => ({ y: h.year, parts: [h.village.sRem, h.village.sImp, h.village.sEbe, h.village.sMixte || 0] })), PARTS)}</div>
+    <div><h3>IDH du village et ses composantes</h3>${svgLines([{ n: 'IDH', c: '#1E2433', v: S.history.map(h => h.village.IDH) }, { n: 'Santé', c: '#3E8E5E', v: S.history.map(h => h.village.iSante) }, { n: 'Éducation', c: '#3C6FB6', v: S.history.map(h => h.village.iEduc) }, { n: 'Niveau de vie', c: '#E2A93B', v: S.history.map(h => h.village.iVie) }], years, { d: 2 })}</div>
+    <div><h3>Gain de productivité par équipe · année ${R.year}</h3>${svgBars(TEAMS.filter(t => t !== 'ecole').map(t => ({ v: Math.round((R.teams[t].gain || 0) * 1000) / 10, c: ACT[t].color, l: ACT[t].em })))}<p class="help">En %, par rapport à l'année précédente (0 la première année).</p></div>
+    <div><h3>Partage de la VA en détail</h3><table class="t"><thead><tr><th></th><th class="n">PIB</th><th class="n">Salaires</th><th class="n">Impôts prod.</th><th class="n">EBE sociétés</th><th class="n">Revenu mixte</th></tr></thead><tbody>${part}</tbody></table></div>`;
+}
+const PARTS = [['Salaires', '#3C6FB6'], ['Impôts sur la production', '#8A94A6'], ['EBE des sociétés', '#E2A93B'], ['Revenu mixte (Ferme)', '#3E8E5E']];
+function svgStacked(rows, legend) {
+  const W = 520, H = 230, L = 40, B = 30, bw = (W - L - 10) / Math.max(1, rows.length);
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">`;
+  [0, 25, 50, 75, 100].forEach(p => { const y = H - B - (H - B - 10) * p / 100; s += `<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="#E6DFCC"/><text x="${L - 6}" y="${y + 4}" text-anchor="end" font-size="11" fill="#667085">${p} %</text>`; });
+  rows.forEach((r, i) => { const tot = r.parts.reduce((a, b) => a + Math.max(0, b), 0) || 1; let y = H - B; const x = L + i * bw + bw * .2;
+    r.parts.forEach((v, k) => { const h = (H - B - 10) * Math.max(0, v) / tot; y -= h; s += `<rect x="${x}" y="${y}" width="${bw * .6}" height="${h}" fill="${legend[k][1]}"/>` + (h > 16 ? `<text x="${x + bw * .3}" y="${y + h / 2 + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${Math.round(Math.max(0, v) / tot * 100)} %</text>` : ''); });
+    s += `<text x="${x + bw * .3}" y="${H - 10}" text-anchor="middle" font-size="12" fill="#667085">An ${r.y}</text>`; });
+  return s + `</svg><div class="legend">${legend.map(l => `<span style="color:${l[1]}">● ${l[0]}</span>`).join('')}</div>`;
+}
+function svgGroups(rows, legend) {
+  const W = 520, H = 230, L = 46, B = 30, max = Math.max(1, ...rows.flatMap(r => r.v)) * 1.12, gw = (W - L - 10) / Math.max(1, rows.length), n = legend.length;
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">`;
+  for (let k = 0; k <= 4; k++) { const y = H - B - (H - B - 10) * k / 4; s += `<line x1="${L}" x2="${W}" y1="${y}" y2="${y}" stroke="#E6DFCC"/><text x="${L - 6}" y="${y + 4}" text-anchor="end" font-size="11" fill="#667085">${fmt(max * k / 4)}</text>`; }
+  rows.forEach((r, i) => { r.v.forEach((v, k) => { const bw = gw * .7 / n, x = L + i * gw + gw * .15 + k * bw, h = (H - B - 10) * Math.max(0, v) / max;
+    s += `<rect x="${x}" y="${H - B - h}" width="${bw - 3}" height="${h}" rx="4" fill="${legend[k][1]}"/><text x="${x + bw / 2}" y="${H - B - h - 4}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1E2433">${fmt(v)}</text>`; });
+    s += `<text x="${L + i * gw + gw / 2}" y="${H - 10}" text-anchor="middle" font-size="12" fill="#667085">An ${r.y}</text>`; });
+  return s + `</svg><div class="legend">${legend.map(l => `<span style="color:${l[1]}">● ${l[0]}</span>`).join('')}</div>`;
+}
+function renderVillageois() {
+  const S = JV.S, R = lastRec(S), box = $('#villageois');
+  if (!R || !R.village.hh) { box.innerHTML = '<p>Les revenus des villageois apparaîtront après la première année.</p>'; return; }
+  const V = R.village, h = V.hh, tot = h.total || 1;
+  const seg = [['Revenus du travail', h.travail, '#3C6FB6'], ['Revenus du capital', h.capital, '#E2A93B'], ['Revenus mixtes', h.mixte, '#3E8E5E']];
+  const payers = TEAMS.map(t => { const x = R.teams[t]; return `<tr><td><b style="color:${ACT[t].color}">${ACT[t].em} ${ACT[t].name}</b></td><td class="n">${fmt(x.rem)}</td><td class="n">${ACT[t].ei ? '—' : fmt(x.div)}</td><td class="n">${ACT[t].ei ? fmt(x.div) : '—'}</td></tr>`; }).join('');
+  const other = Math.max(0, h.spent - h.pain - h.legumes - h.maisons);
+  box.innerHTML = `
+    <div><h3>D'où viennent les revenus des villageois ? · année ${R.year}</h3>
+      <div class="hbar">${seg.map(([n, v, c]) => `<div style="flex-basis:${Math.max(0, v) / tot * 100}%;background:${c}">${v / tot > .08 ? Math.round(v / tot * 100) + ' %' : ''}</div>`).join('')}</div>
+      <div class="legend">${seg.map(([n, v, c]) => `<span style="color:${c}">● ${n}</span>`).join('')}</div>
+      <table class="t" style="margin-top:.8rem"><tbody>
+        <tr><td>Revenus du travail (salaires versés par les 6 équipes)</td><td class="n">${fmt(h.travail)}</td></tr>
+        <tr><td>Revenus du capital (dividendes des sociétés)</td><td class="n">${fmt(h.capital)}</td></tr>
+        <tr><td>Revenus mixtes (prélevés par l'exploitant de la Ferme)</td><td class="n">${fmt(h.mixte)}</td></tr>
+        <tr class="tot"><td>= Revenus primaires</td><td class="n">${fmt(h.total)}</td></tr>
+        <tr><td>− Impôt sur le revenu (prélèvement obligatoire)</td><td class="n">${fmt(h.impot)}</td></tr>
+        <tr class="tot"><td>= Revenu disponible</td><td class="n">${fmt(h.dispo)}</td></tr></tbody></table>
+      <p class="help">Les prestations sociales et la redistribution seront étudiées en terminale : ici, on observe seulement la composition du revenu.</p></div>
+    <div><h3>Qui verse quels revenus ?</h3>
+      <table class="t"><thead><tr><th>Équipe</th><th class="n">Salaires</th><th class="n">Dividendes</th><th class="n">Revenu mixte prélevé</th></tr></thead><tbody>${payers}</tbody></table>
+      <h3 style="margin-top:1.2rem">Ce que les villageois ont acheté cette année</h3>
+      <table class="t"><tbody>
+        <tr><td>🍞 Pain (${fmt(V.hhPain, 0)} pour ${V.P0} habitants)</td><td class="n">${fmt(h.pain)}</td></tr>
+        <tr><td>🥕 Légumes (${fmt(V.hhLeg, 0)} paniers)</td><td class="n">${fmt(h.legumes)}</td></tr>
+        <tr><td>🏠 Maisons (${V.houses})</td><td class="n">${fmt(h.maisons)}</td></tr>
+        <tr><td>Villageois bien nourris</td><td class="n"><b>${pct(V.foodSat)}</b></td></tr>
+        <tr><td>Population</td><td class="n">${V.P0} → ${V.P}</td></tr></tbody></table></div>`;
+}
+function renderEnd() {
+  const S = JV.S; const rank = TEAMS.slice().sort((a, b) => S.teams[b].score - S.teams[a].score);
+  const f = S.history[0].village, l = lastRec(S).village;
+  $('#endscreen').innerHTML = `<h3 style="font-size:2rem;margin-bottom:.4rem">Bilan de la partie</h3>
+    <p style="font-size:1.1rem">En ${S.history.length} ans, le PIB du village est passé de <b>${fmt(f.PIB)}</b> à <b>${fmt(l.PIB)}</b> écus, la population de <b>${f.P0}</b> à <b>${l.P}</b> habitants, et l'IDH de <b>${fmt(f.IDH, 3)}</b> à <b>${fmt(l.IDH, 3)}</b>.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1rem">
+      <div><h3>Classement</h3><table class="t"><tbody>${rank.map((t, i) => `<tr><td style="font-size:1.3rem">${['🥇', '🥈', '🥉'][i] || i + 1}</td><td><b style="color:${ACT[t].color}">${ACT[t].em} ${ACT[t].name}</b></td><td class="n"><b>${fmt(S.teams[t].score)}</b> pts</td></tr>`).join('')}</tbody></table>
+      <p class="help">Score = performance de l'équipe (VA, taux de marge, gains de productivité) × IDH du village, chaque année.</p></div>
+      <div><h3>Questions pour le débriefing</h3><ol style="margin:0;padding-left:1.2rem;line-height:1.7">
+        <li>Quelle équipe a le plus augmenté sa productivité ? Grâce à quel facteur ?</li>
+        <li>Pourquoi additionner les chiffres d'affaires des équipes surestimerait-il la richesse du village ?</li>
+        <li>Comment la valeur ajoutée a-t-elle été partagée entre salaires, impôts et EBE ? Qui a choisi de verser des dividendes ?</li>
+        <li>Pourquoi le revenu de l'exploitant de la Ferme est-il un revenu mixte, et non un salaire ou un dividende ?</li>
+        <li>Un prix très élevé imposé à un partenaire a-t-il été rentable pour le village ?</li>
+        <li>Quel rôle a joué l'École, alors qu'elle ne vendait rien ?</li></ol></div>
+    </div>`;
+}
+
+/* ----------------------------- ROUTAGE ----------------------------- */
+function route() {
+  const h = location.hash.replace(/^#/, '').split('/');
+  if (h[0] === 'equipe' && h[1] && TEAMS.includes(h[2])) return initTeam(h[1], h[2]);
+  if (h[0] === 'prof' && h[1]) return initProf(h[1]);
+  if (h[0] === 'projection' && h[1]) return initProj(h[1]);
+  initHome();
+}
+window.addEventListener('hashchange', () => location.reload());
+route();
+</script>
+</body>
+</html>
